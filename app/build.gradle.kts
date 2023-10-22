@@ -192,6 +192,12 @@ dependencies {
     implementation("androidx.media3:media3-exoplayer-dash:1.1.1")
     implementation("androidx.media3:media3-ui:1.1.1")
 
+    // media: MediaBrowserServiceCompat and MediaBrowserCompat
+    implementation("androidx.media:media:1.6.0")
+
+    // MediaSessionConnector
+    implementation("androidx.media3:media3-session:1.1.1")
+
     /*
     // ExoPlayer
     api("com.google.android.exoplayer:exoplayer-core:2.11.8")
