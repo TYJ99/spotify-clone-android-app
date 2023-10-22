@@ -2,7 +2,7 @@ package com.tyj.spotifycloneandroidapp.data.remote
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tyj.spotifycloneandroidapp.common.Constants.SONG_COLLECTION
-import com.tyj.spotifycloneandroidapp.data.entities.Song
+import com.tyj.spotifycloneandroidapp.domain.model.Song
 import kotlinx.coroutines.tasks.await
 /*
     Todo: Try to use local database for caching songs in local package

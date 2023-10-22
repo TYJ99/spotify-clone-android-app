@@ -1,7 +1,5 @@
-package com.tyj.spotifycloneandroidapp.exoplayer
+package com.tyj.spotifycloneandroidapp.data.repository
 
-import android.support.v4.media.MediaBrowserCompat
-import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI
 import android.support.v4.media.MediaMetadataCompat.METADATA_KEY_ARTIST
@@ -19,21 +17,22 @@ import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.source.ConcatenatingMediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import com.tyj.spotifycloneandroidapp.data.remote.MusicDatabase
-import com.tyj.spotifycloneandroidapp.exoplayer.State.STATE_CREATED
-import com.tyj.spotifycloneandroidapp.exoplayer.State.STATE_ERROR
-import com.tyj.spotifycloneandroidapp.exoplayer.State.STATE_INITIALIZED
-import com.tyj.spotifycloneandroidapp.exoplayer.State.STATE_INITIALIZING
+import com.tyj.spotifycloneandroidapp.data.repository.State.STATE_CREATED
+import com.tyj.spotifycloneandroidapp.data.repository.State.STATE_ERROR
+import com.tyj.spotifycloneandroidapp.data.repository.State.STATE_INITIALIZED
+import com.tyj.spotifycloneandroidapp.data.repository.State.STATE_INITIALIZING
+import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FirebaseMusicSource @Inject constructor(
     private val musicDatabase: MusicDatabase
-) {
+): MusicRepository {
 
     var songs = emptyList<MediaMetadataCompat>()
 
-    suspend fun fetchMediaData() = withContext(Dispatchers.IO) {
+    override suspend fun fetchMediaData() = withContext(Dispatchers.IO) {
         state = STATE_INITIALIZING
         val allSongs = musicDatabase.getAllSongs()
         songs = allSongs.map {song ->

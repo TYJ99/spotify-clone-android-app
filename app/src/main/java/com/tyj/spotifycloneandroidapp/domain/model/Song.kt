@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.data.entities
+package com.tyj.spotifycloneandroidapp.domain.model
 
 data class Song(
     val mediaId: String = "",

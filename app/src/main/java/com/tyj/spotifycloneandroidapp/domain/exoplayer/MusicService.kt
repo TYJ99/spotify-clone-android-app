@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.exoplayer
+package com.tyj.spotifycloneandroidapp.domain.exoplayer
 
 import android.app.PendingIntent
 import android.os.Bundle
@@ -7,6 +7,7 @@ import androidx.media.MediaBrowserServiceCompat
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
+import com.tyj.spotifycloneandroidapp.domain.exoplayer.callbacks.MusicPlayerNotificationListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,8 @@ class MusicService: MediaBrowserServiceCompat() {
 
     @Inject
     lateinit var exoPlayer: ExoPlayer
+
+    private lateinit var musicNotificationManager: MusicNotificationManager
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
@@ -53,6 +56,8 @@ class MusicService: MediaBrowserServiceCompat() {
     private lateinit var mediaSession: MediaSession
     //private lateinit var mediaSessionConnector: MediaSessionConnector
 
+    var isForegroundService = false
+
     @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onCreate() {
         super.onCreate()
@@ -76,6 +81,14 @@ class MusicService: MediaBrowserServiceCompat() {
             .build()
 
         sessionToken = mediaSession.sessionCompatToken
+
+        musicNotificationManager = MusicNotificationManager(
+            this,
+            mediaSession.sessionCompatToken,
+            MusicPlayerNotificationListener(this)
+        ) {
+
+        }
 
     }
 
