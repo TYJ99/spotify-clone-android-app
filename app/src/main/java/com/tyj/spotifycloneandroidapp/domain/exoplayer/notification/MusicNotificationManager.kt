@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.domain.exoplayer
+package com.tyj.spotifycloneandroidapp.domain.exoplayer.notification
 
 import android.app.PendingIntent
 import android.content.Context
