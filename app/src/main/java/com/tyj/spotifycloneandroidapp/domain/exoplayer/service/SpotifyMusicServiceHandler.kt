@@ -5,7 +5,6 @@ import androidx.media3.common.Player
 import androidx.media3.exoplayer.ExoPlayer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,7 @@ class SpotifyMusicServiceHandler @Inject constructor(
     private val exoPlayer: ExoPlayer,
 ) : Player.Listener {
     private val _songState: MutableStateFlow<SongState> = MutableStateFlow(SongState.Initial)
-    val audioState: StateFlow<SongState> = _songState.asStateFlow()
+    val songState: StateFlow<SongState> = _songState.asStateFlow()
 
     private var job: Job? = null
 

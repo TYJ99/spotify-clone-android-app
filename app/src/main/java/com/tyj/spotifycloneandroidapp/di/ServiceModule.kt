@@ -11,8 +11,10 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
 import com.tyj.spotifycloneandroidapp.data.remote.MusicDatabase
+import com.tyj.spotifycloneandroidapp.data.repository.FirebaseMusicRepository
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.notification.SpotifyMusicNotificationManager
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler
+import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -83,6 +85,13 @@ object ServiceModule {
     @ServiceScoped
     fun provideServiceHandler(exoPlayer: ExoPlayer): SpotifyMusicServiceHandler =
         SpotifyMusicServiceHandler(exoPlayer)
+
+    @ServiceScoped
+    @Provides
+    @Singleton
+    fun provideMusicRepository(musicDatabase: MusicDatabase): MusicRepository {
+        return FirebaseMusicRepository(musicDatabase)
+    }
 
     @ServiceScoped
     @Provides
