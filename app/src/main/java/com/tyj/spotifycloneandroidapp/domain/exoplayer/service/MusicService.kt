@@ -72,7 +72,7 @@ class MusicService: MediaBrowserServiceCompat() {
         //                                                 it's up to you to decide if it's nullable or not.
         // https://stackoverflow.com/questions/43826699/single-exclamation-mark-in-kotlin
 
-        // packageManager?.getLaunchIntentForPackage(packageName): a normal intent that just lead to out activity
+        // packageManager?.getLaunchIntentForPackage(packageName): a normal intent that just lead to our activity
         val activityIntent = packageManager?.getLaunchIntentForPackage(packageName)?.let {
             PendingIntent.getActivity(this, 0, it, PendingIntent.FLAG_IMMUTABLE)
         }
