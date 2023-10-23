@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.domain.exoplayer
+package com.tyj.spotifycloneandroidapp.domain.exoplayer.service
 
 import android.app.PendingIntent
 import android.os.Bundle
@@ -7,6 +7,7 @@ import androidx.media.MediaBrowserServiceCompat
 import androidx.media3.datasource.DefaultDataSource
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
+import com.tyj.spotifycloneandroidapp.domain.exoplayer.MusicNotificationManager
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.callbacks.MusicPlayerNotificationListener
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope

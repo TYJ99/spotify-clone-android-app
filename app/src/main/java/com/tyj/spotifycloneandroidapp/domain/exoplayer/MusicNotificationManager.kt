@@ -38,6 +38,7 @@ class MusicNotificationManager(
             .setNotificationListener(notificationListener)
             .setSmallIconResourceId(R.drawable.ic_music)
             .build()
+
         /*
         notificationManager = PlayerNotificationManager.createWithNotificationChannel(
             context,

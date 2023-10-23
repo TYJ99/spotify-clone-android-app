@@ -7,7 +7,7 @@ import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_ID
-import com.tyj.spotifycloneandroidapp.domain.exoplayer.MusicService
+import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.MusicService
 
 @UnstableApi
 class MusicPlayerNotificationListener (

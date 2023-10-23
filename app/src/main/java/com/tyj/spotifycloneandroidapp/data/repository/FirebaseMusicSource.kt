@@ -26,6 +26,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+
 class FirebaseMusicSource @Inject constructor(
     private val musicDatabase: MusicDatabase
 ): MusicRepository {
@@ -49,6 +50,7 @@ class FirebaseMusicSource @Inject constructor(
                 .build()
         }
         state = STATE_INITIALIZED
+        allSongs
     }
 
     /*
