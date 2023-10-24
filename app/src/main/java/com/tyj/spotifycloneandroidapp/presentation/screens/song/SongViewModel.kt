@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.presentation.song
+package com.tyj.spotifycloneandroidapp.presentation.screens.song
 
 import android.support.v4.media.MediaMetadataCompat
 import androidx.compose.runtime.mutableStateOf
