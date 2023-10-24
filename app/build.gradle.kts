@@ -96,6 +96,8 @@ dependencies {
     implementation ("androidx.compose.material:material:1.1.0-rc01")
     implementation ("androidx.compose.material:material-icons-extended")
 
+    implementation ("com.google.accompanist:accompanist-permissions:0.30.0")
+
     // Coroutine
     val coroutinesVersion: String = "1.7.3"
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
