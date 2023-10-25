@@ -1,6 +1,7 @@
 package com.tyj.spotifycloneandroidapp.presentation.screens.song
 
 import android.support.v4.media.MediaMetadataCompat
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
@@ -10,6 +11,7 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import com.tyj.spotifycloneandroidapp.data.repository.FirebaseMusicRepository
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.PlayerEvent
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SongState
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler
@@ -47,6 +49,7 @@ class SongViewModel @Inject constructor(
     val uiState: StateFlow<UIState> = _uiState.asStateFlow()
 
     init {
+        Log.i("viewModel", "loadAudioData")
         loadAudioData()
     }
 
@@ -76,6 +79,7 @@ class SongViewModel @Inject constructor(
     private fun loadAudioData() {
         viewModelScope.launch {
             val audio = repository.fetchMediaData()
+            Log.i("firebase data", "$audio")
             songList = audio
             setMediaItems()
         }

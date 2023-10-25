@@ -15,40 +15,19 @@ import com.tyj.spotifycloneandroidapp.data.repository.FirebaseMusicRepository
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.notification.SpotifyMusicNotificationManager
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler
 import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ServiceComponent
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ServiceScoped
+import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
 @InstallIn(ServiceComponent::class)
 object ServiceModule {
-
-    @ServiceScoped
-    @Provides
-    fun provideMusicDatabase() = MusicDatabase()
-
-    @ServiceScoped
-    @Provides
-    fun provideAudioAttributes() = AudioAttributes.Builder()
-        .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
-        .setUsage(C.USAGE_MEDIA)
-        .build()
-
-    @ServiceScoped
-    @Provides
-    @UnstableApi
-    fun provideExoPlayer(
-        @ApplicationContext context: Context,
-        audioAttributes: AudioAttributes
-    ) = ExoPlayer.Builder(context)
-        .setAudioAttributes(audioAttributes, true)
-        .setHandleAudioBecomingNoisy(true)
-        .setTrackSelector(DefaultTrackSelector(context))
-        .build()
 
     @ServiceScoped
     @Provides
@@ -81,17 +60,6 @@ object ServiceModule {
         exoPlayer = exoPlayer
     )
 
-    @Provides
-    @ServiceScoped
-    fun provideServiceHandler(exoPlayer: ExoPlayer): SpotifyMusicServiceHandler =
-        SpotifyMusicServiceHandler(exoPlayer)
-
-    @ServiceScoped
-    @Provides
-    @Singleton
-    fun provideMusicRepository(musicDatabase: MusicDatabase): MusicRepository {
-        return FirebaseMusicRepository(musicDatabase)
-    }
 
     @ServiceScoped
     @Provides

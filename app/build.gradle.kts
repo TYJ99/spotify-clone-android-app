@@ -5,6 +5,7 @@ plugins {
     id("com.google.devtools.ksp")
     id("com.google.dagger.hilt.android")
     id("com.google.gms.google-services")
+    kotlin("kapt")
 
 //    id("dagger.hilt.android.plugin")
 }
@@ -84,7 +85,7 @@ dependencies {
     implementation("androidx.compose.material3:material3:1.1.2")
     implementation("androidx.compose.material3:material3-window-size-class:1.1.2")
     implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.10.0")
+    implementation("com.google.android.material:material:1.9.0")
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -173,8 +174,8 @@ dependencies {
     //implementation("io.coil-kt:coil-compose:1.3.2")
 
     // Glide
-    implementation("com.github.bumptech.glide:glide:4.11.0")
-    ksp("com.github.bumptech.glide:ksp:4.11.0")
+    implementation("com.github.bumptech.glide:glide:4.15.1")
+//    ksp("com.github.bumptech.glide:ksp:4.11.0")
 //    implementation("com.github.bumptech.glide:glide:4.11.0")
 //    kapt("com.github.bumptech.glide:compiler:4.11.0")
 
@@ -212,6 +213,7 @@ dependencies {
      */
 
 }
+
 
 // Allow references to generated code
 kapt {
