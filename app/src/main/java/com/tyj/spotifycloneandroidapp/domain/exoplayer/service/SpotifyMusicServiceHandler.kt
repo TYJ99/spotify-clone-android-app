@@ -1,8 +1,16 @@
 package com.tyj.spotifycloneandroidapp.domain.exoplayer.service
 
+import android.app.Service
+import android.content.Intent
+import android.os.Build
+import android.util.Log
+import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
+import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
+import androidx.media3.session.MediaSession
+import com.google.api.Context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -14,12 +22,15 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SpotifyMusicServiceHandler @Inject constructor(
-    private val exoPlayer: ExoPlayer,
+    private val mediaSession: MediaSession,
+    private val spotifyMusicService: SpotifyMusicService
 ) : Player.Listener {
     private val _songState: MutableStateFlow<SongState> = MutableStateFlow(SongState.Initial)
     val songState: StateFlow<SongState> = _songState.asStateFlow()
 
     private var job: Job? = null
+
+    private val exoPlayer = mediaSession.player
 
     init {
         exoPlayer.addListener(this)
@@ -64,7 +75,11 @@ class SpotifyMusicServiceHandler @Inject constructor(
                 }
             }
 
-            PlayerEvent.Stop -> stopProgressUpdate()
+            PlayerEvent.Stop -> {
+                Log.i("myDebug", "PlayerEvent.Stop")
+                stopProgressUpdate()
+                //stopSpotifyMusicServiceAndPlayingSong()
+            }
             is PlayerEvent.UpdateProgress -> {
                 exoPlayer.seekTo(
                     (exoPlayer.duration * playerEvent.newProgress).toLong()
@@ -116,11 +131,26 @@ class SpotifyMusicServiceHandler @Inject constructor(
     }
 
     private fun stopProgressUpdate() {
+        Log.i("myDebug", "stopProgressUpdate")
         job?.cancel()
         _songState.value = SongState.Playing(isPlaying = false)
     }
 
+    /*
+    fun stopSpotifyMusicServiceAndPlayingSong() {
+        Log.i("myDebug", "stopSpotifyMusicServiceAndPlayingSong ")
+        mediaSession.apply {
+            release()
+            if(player.playbackState != Player.STATE_IDLE) {
+                player.seekTo(0)
+                player.playWhenReady = false
+                player.stop()
+                player.release()
+            }
+        }
+    }
 
+     */
 }
 
 sealed class PlayerEvent {

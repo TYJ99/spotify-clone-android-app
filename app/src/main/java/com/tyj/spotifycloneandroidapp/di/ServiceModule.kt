@@ -13,6 +13,7 @@ import androidx.media3.session.MediaSession
 import com.tyj.spotifycloneandroidapp.data.remote.MusicDatabase
 import com.tyj.spotifycloneandroidapp.data.repository.FirebaseMusicRepository
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.notification.SpotifyMusicNotificationManager
+import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicService
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler
 import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import dagger.Binds
@@ -26,42 +27,23 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ServiceComponent::class)
 object ServiceModule {
 
-    @Singleton
     @Provides
-    fun provideActivityPendingIntent(application: Application,
-                              @ApplicationContext context: Context): PendingIntent {
-        val packageName = application.packageName
-        val activityPendingIntent = application.packageManager?.getLaunchIntentForPackage(packageName)?.let {
-            PendingIntent.getActivity(context, 0, it, PendingIntent.FLAG_IMMUTABLE)
-        }
-        return activityPendingIntent!!
-    }
-
-    @Singleton
-    @Provides
-    fun provideMediaSession(
-        @ApplicationContext context: Context,
-        exoPlayer: ExoPlayer,
-        activityPendingIntent: PendingIntent
-    ): MediaSession = MediaSession.Builder(context, exoPlayer)
-        .setSessionActivity(activityPendingIntent)
-        .build()
-
-    @Provides
-    @Singleton
+    @ServiceScoped
     fun provideNotificationManager(
         @ApplicationContext context: Context,
         exoPlayer: ExoPlayer,
+        spotifyMusicService: SpotifyMusicService
     ): SpotifyMusicNotificationManager = SpotifyMusicNotificationManager(
         context = context,
-        exoPlayer = exoPlayer
+        exoPlayer = exoPlayer,
+        spotifyMusicService = spotifyMusicService
     )
 
 
-    @Singleton
+    @ServiceScoped
     @Provides
     fun provideDataSourceFactory(
         @ApplicationContext context: Context

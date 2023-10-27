@@ -6,8 +6,10 @@ import androidx.media3.common.C
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
+import androidx.media3.session.MediaSession
 import com.tyj.spotifycloneandroidapp.data.remote.MusicDatabase
 import com.tyj.spotifycloneandroidapp.data.repository.FirebaseMusicRepository
+import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicService
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler
 import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import dagger.Module
@@ -20,20 +22,23 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 object ViewModelModule {
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideMusicDatabase() = MusicDatabase()
 
     @Provides
-    @Singleton
-    fun provideServiceHandler(exoPlayer: ExoPlayer): SpotifyMusicServiceHandler =
-        SpotifyMusicServiceHandler(exoPlayer)
+    @ViewModelScoped
+    fun provideServiceHandler(
+        mediaSession: MediaSession,
+        spotifyMusicService: SpotifyMusicService
+    ): SpotifyMusicServiceHandler =
+        SpotifyMusicServiceHandler(mediaSession, spotifyMusicService)
 
     @Provides
-    @Singleton
+    @ViewModelScoped
     fun provideMusicRepository(musicDatabase: MusicDatabase): MusicRepository {
         return FirebaseMusicRepository(musicDatabase)
     }

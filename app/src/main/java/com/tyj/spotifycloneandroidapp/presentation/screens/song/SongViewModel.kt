@@ -20,13 +20,18 @@ import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServi
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers.IO
+import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.system.exitProcess
 
 
 private val dummySong = Song(
@@ -76,8 +81,8 @@ class SongViewModel @Inject constructor(
     val uiState: StateFlow<UIState> = _uiState.asStateFlow()
 
     init {
-        Log.i("viewModel", "before loadAudioData: $songList")
-        Log.i("viewModel", "loadAudioData")
+        Log.i("myDebug", "before loadAudioData: $songList")
+        Log.i("myDebug", "loadAudioData")
         loadAudioData()
 
     }
@@ -108,9 +113,9 @@ class SongViewModel @Inject constructor(
     private fun loadAudioData() {
         viewModelScope.launch {
             val audio = repository.fetchMediaData()
-            Log.i("firebase data", "$audio")
+            Log.i("myDebug", "firebase data: $audio")
             _songList.value = audio
-            Log.i("viewModel", "after loadAudioData: $songList")
+            Log.i("myDebug", "after loadAudioData: ${_songList.value}")
             setMediaItems()
         }
     }
@@ -221,11 +226,11 @@ class SongViewModel @Inject constructor(
     }
 
     override fun onCleared() {
-        Log.i("ViewModel", "onCleared is called")
-        viewModelScope.launch {
+        super.onCleared()
+        Log.i("myDebug", "ViewModel onCleared")
+        GlobalScope.launch(Main) {
             musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)
         }
-        super.onCleared()
     }
 
 
