@@ -20,20 +20,20 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(ViewModelComponent::class)
+@InstallIn(SingletonComponent::class)
 object ViewModelModule {
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     fun provideMusicDatabase() = MusicDatabase()
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     fun provideServiceHandler(exoPlayer: ExoPlayer): SpotifyMusicServiceHandler =
         SpotifyMusicServiceHandler(exoPlayer)
 
     @Provides
-    @ViewModelScoped
+    @Singleton
     fun provideMusicRepository(musicDatabase: MusicDatabase): MusicRepository {
         return FirebaseMusicRepository(musicDatabase)
     }

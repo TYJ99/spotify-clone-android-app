@@ -19,6 +19,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicService
@@ -63,8 +64,8 @@ class MainActivity : ComponentActivity() {
                         progress = viewModel.progress,
                         onProgress = { viewModel.onUiEvents(UIEvents.SeekTo(it)) },
                         isAudioPlaying = viewModel.isPlaying,
-                        songList = viewModel.songList,
-                        currentPlayingAudio = viewModel.currentSelectedSong,
+                        songList = viewModel.songList.collectAsStateWithLifecycle().value,
+                        currentPlayingAudio = viewModel.currentSelectedSong.collectAsStateWithLifecycle().value,
                         onStart = {
                             viewModel.onUiEvents(UIEvents.PlayPause)
                         },

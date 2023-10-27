@@ -2,7 +2,9 @@ package com.tyj.spotifycloneandroidapp.presentation.screens.song
 
 import android.support.v4.media.MediaMetadataCompat
 import android.util.Log
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -42,15 +44,42 @@ class SongViewModel @Inject constructor(
     var progress by savedStateHandle.saveable { mutableStateOf(0f) }
     var progressString by savedStateHandle.saveable { mutableStateOf("00:00") }
     var isPlaying by savedStateHandle.saveable { mutableStateOf(false) }
-    var currentSelectedSong by savedStateHandle.saveable { mutableStateOf(dummySong) }
-    var songList by savedStateHandle.saveable { mutableStateOf(listOf<Song>()) }
+//    var currentSelectedSong by savedStateHandle.saveable { mutableStateOf(dummySong) }
+//    var songList by savedStateHandle.saveable { mutableStateOf(listOf<Song>()) }
+
+    private val _currentSelectedSong: MutableStateFlow<Song> = MutableStateFlow(dummySong)
+    val currentSelectedSong: StateFlow<Song> = _currentSelectedSong.asStateFlow()
+
+    private val _songList: MutableStateFlow<List<Song>> = MutableStateFlow(listOf<Song>())
+    val songList: StateFlow<List<Song>> = _songList.asStateFlow()
+
+//    var duration by mutableStateOf (
+//        savedStateHandle.get<Long>("duration") ?: 0L
+//    )
+//    var progress by mutableStateOf (
+//            savedStateHandle.get<Float>("progress") ?: 0f
+//    )
+//    var progressString by mutableStateOf (
+//        savedStateHandle.get<String>("progress") ?: "00:00"
+//    )
+//    var isPlaying by mutableStateOf (
+//        savedStateHandle.get<Boolean>("isPlaying") ?: false
+//    )
+//    var currentSelectedSong by mutableStateOf (
+//        savedStateHandle.get<Song>("currentSelectedSong") ?: dummySong
+//    )
+//    var songList by mutableStateOf (
+//        savedStateHandle.get<Song>("currentSelectedSong") ?: dummySong
+//    )
 
     private val _uiState: MutableStateFlow<UIState> = MutableStateFlow(UIState.Initial)
     val uiState: StateFlow<UIState> = _uiState.asStateFlow()
 
     init {
+        Log.i("viewModel", "before loadAudioData: $songList")
         Log.i("viewModel", "loadAudioData")
         loadAudioData()
+
     }
 
     init {
@@ -62,7 +91,7 @@ class SongViewModel @Inject constructor(
                     is SongState.Playing -> isPlaying = songState.isPlaying
                     is SongState.Progress -> calculateProgressValue(songState.progress)
                     is SongState.CurrentPlaying -> {
-                        currentSelectedSong = songList[songState.mediaItemIndex]
+                        _currentSelectedSong.value = _songList.value[songState.mediaItemIndex]
                     }
 
                     is SongState.Ready -> {
@@ -80,12 +109,13 @@ class SongViewModel @Inject constructor(
         viewModelScope.launch {
             val audio = repository.fetchMediaData()
             Log.i("firebase data", "$audio")
-            songList = audio
+            _songList.value = audio
+            Log.i("viewModel", "after loadAudioData: $songList")
             setMediaItems()
         }
     }
 
-    private fun setMediaItems() = songList.map { song ->
+    private fun setMediaItems() = _songList.value.map { song ->
         val mediaMetadata = MediaMetadata.Builder()
             .setArtworkUri(song.imageUrl.toUri())
             .setTitle(song.title)
@@ -191,6 +221,7 @@ class SongViewModel @Inject constructor(
     }
 
     override fun onCleared() {
+        Log.i("ViewModel", "onCleared is called")
         viewModelScope.launch {
             musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)
         }

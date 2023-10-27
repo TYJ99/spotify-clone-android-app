@@ -26,10 +26,10 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 @Module
-@InstallIn(ServiceComponent::class)
+@InstallIn(SingletonComponent::class)
 object ServiceModule {
 
-    @ServiceScoped
+    @Singleton
     @Provides
     fun provideActivityPendingIntent(application: Application,
                               @ApplicationContext context: Context): PendingIntent {
@@ -40,7 +40,7 @@ object ServiceModule {
         return activityPendingIntent!!
     }
 
-    @ServiceScoped
+    @Singleton
     @Provides
     fun provideMediaSession(
         @ApplicationContext context: Context,
@@ -51,7 +51,7 @@ object ServiceModule {
         .build()
 
     @Provides
-    @ServiceScoped
+    @Singleton
     fun provideNotificationManager(
         @ApplicationContext context: Context,
         exoPlayer: ExoPlayer,
@@ -61,7 +61,7 @@ object ServiceModule {
     )
 
 
-    @ServiceScoped
+    @Singleton
     @Provides
     fun provideDataSourceFactory(
         @ApplicationContext context: Context

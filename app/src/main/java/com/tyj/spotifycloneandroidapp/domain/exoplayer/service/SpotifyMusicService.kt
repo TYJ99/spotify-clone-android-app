@@ -3,6 +3,7 @@ package com.tyj.spotifycloneandroidapp.domain.exoplayer.service
 import android.content.Intent
 import android.os.Build
 import androidx.media3.common.Player
+import androidx.media3.common.util.Log
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.session.MediaSession
 import androidx.media3.session.MediaSessionService
@@ -29,12 +30,15 @@ class SpotifyMusicService: MediaSessionService() {
         }
         return super.onStartCommand(intent, flags, startId)
     }
+
     override fun onGetSession(controllerInfo: MediaSession.ControllerInfo): MediaSession {
         return mediaSession
     }
 
+    @androidx.annotation.OptIn(androidx.media3.common.util.UnstableApi::class)
     override fun onDestroy() {
         super.onDestroy()
+        Log.i("SpotifyMusicService", "onDestroy")
         mediaSession.apply {
             release()
             if(player.playbackState != Player.STATE_IDLE) {
