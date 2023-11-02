@@ -179,8 +179,11 @@ dependencies {
 //    implementation("com.github.bumptech.glide:glide:4.11.0")
 //    kapt("com.github.bumptech.glide:compiler:4.11.0")
 
+    /*
     // Timber
     implementation("com.jakewharton.timber:timber:4.7.1")
+    
+     */
 
     // Firebase Firestore
     implementation("com.google.firebase:firebase-firestore:24.9.0")

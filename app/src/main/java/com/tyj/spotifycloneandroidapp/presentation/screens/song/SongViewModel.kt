@@ -1,10 +1,10 @@
 package com.tyj.spotifycloneandroidapp.presentation.screens.song
 
-import android.support.v4.media.MediaMetadataCompat
+import android.content.Context
+import android.graphics.Bitmap
+import android.graphics.drawable.Drawable
 import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.core.net.toUri
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -13,25 +13,24 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import com.tyj.spotifycloneandroidapp.data.repository.FirebaseMusicRepository
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.PlayerEvent
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SongState
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers.IO
-import kotlinx.coroutines.Dispatchers.Main
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
-import kotlin.system.exitProcess
 
 
 private val dummySong = Song(
@@ -57,6 +56,15 @@ class SongViewModel @Inject constructor(
 
     private val _songList: MutableStateFlow<List<Song>> = MutableStateFlow(listOf<Song>())
     val songList: StateFlow<List<Song>> = _songList.asStateFlow()
+
+    /*
+    private val _songImage: MutableStateFlow<Bitmap?> = MutableStateFlow(null)
+    val songImage: StateFlow<Bitmap?> = _songImage.asStateFlow()
+
+     */
+
+    private val mediaIdBitmapItemMap: MutableMap<String, BitMapItem> = mutableMapOf()
+    var loadHolderBitmap: Bitmap? = null
 
 //    var duration by mutableStateOf (
 //        savedStateHandle.get<Long>("duration") ?: 0L
@@ -109,6 +117,7 @@ class SongViewModel @Inject constructor(
 
         }
     }
+
 
     private fun loadAudioData() {
         viewModelScope.launch {
@@ -182,6 +191,94 @@ class SongViewModel @Inject constructor(
         progressString = formatDuration(currentProgress)
     }
 
+    fun loadSongImage(context: Context, song: Song): StateFlow<Bitmap?> {
+        val bitMapItem = mediaIdBitmapItemMap[song.mediaId]
+        bitMapItem?.let { bitmapItem ->
+            Log.i("myDebug", "loadSongImage, mediaIdBitmapItemMap: $mediaIdBitmapItemMap")
+            bitmapItem.bitmap?.let { bitmap ->
+                if(bitmap != loadHolderBitmap) {
+                    Log.i("myDebugGlide", "4")
+                    Log.i("myDebug", "loadSongImage reduce time, song.mediaId: ${song.mediaId}")
+                    Log.i("myDebug", "loadSongImage reduce time, loadHolderBitmap: $loadHolderBitmap")
+                    return bitmapItem.bitmapStateFlow.asStateFlow()
+                }
+            }
+        }
+
+        if(bitMapItem == null) {
+            mediaIdBitmapItemMap[song.mediaId] = BitMapItem(null, MutableStateFlow(null))
+            // first load local default image
+            Glide.with(context)
+                .asBitmap()
+                .load(R.drawable.load_holder)
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(
+                        resource: Bitmap,
+                        transition: Transition<in Bitmap>?) {
+                        Log.i("myDebugGlide", "1")
+                        Log.i("myDebug", "In Glide, loadSongImage: load_holder, song: ${song.mediaId}")
+
+                        // _songImage.value = resource
+                        mediaIdBitmapItemMap[song.mediaId]!!.bitmap = resource
+                        mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.value = resource
+                        if(loadHolderBitmap == null) loadHolderBitmap = resource
+                    }
+
+                    override fun onLoadCleared(placeholder: Drawable?) = Unit
+                })
+
+            try {
+                Glide.with(context)
+                    .asBitmap()
+                    .load(song.imageUrl)
+                    .into(object : CustomTarget<Bitmap>() {
+                        override fun onResourceReady(
+                            resource: Bitmap,
+                            transition: Transition<in Bitmap>?
+                        ) {
+                            Log.i("myDebugGlide", "2")
+                            Log.i("myDebug", "In Glide, loadSongImage: song.imageUrl, song: ${song.mediaId}")
+                            // _songImage.value = resource
+                            mediaIdBitmapItemMap[song.mediaId]!!.bitmap = resource
+                            mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.value = resource
+                        }
+
+                        override fun onLoadCleared(placeholder: Drawable?) {}
+                    })
+            } catch (glideException: GlideException) {
+                Log.i("myDebug", "error: ${glideException.rootCauses}")
+            }
+        }else {
+            if(bitMapItem.bitmap == loadHolderBitmap) {
+                // load image from URL
+                try {
+                    Glide.with(context)
+                        .asBitmap()
+                        .load(song.imageUrl)
+                        .into(object : CustomTarget<Bitmap>() {
+                            override fun onResourceReady(
+                                resource: Bitmap,
+                                transition: Transition<in Bitmap>?
+                            ) {
+                                Log.i("myDebugGlide", "3")
+                                Log.i("myDebug", "In Glide, loadSongImage: song.imageUrl, song: ${song.mediaId}")
+                                // _songImage.value = resource
+                                mediaIdBitmapItemMap[song.mediaId]!!.bitmap = resource
+                                mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.value = resource
+                            }
+
+                            override fun onLoadCleared(placeholder: Drawable?) {}
+                        })
+                } catch (glideException: GlideException) {
+                    Log.i("myDebug", "glide error: ${glideException.rootCauses}")
+                }
+            }
+
+        }
+
+        return mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.asStateFlow()
+    }
+
     fun onUiEvents(uiEvents: UIEvents) = viewModelScope.launch {
         when (uiEvents) {
             UIEvents.Backward -> musicServiceHandler.onPlayerEvents(PlayerEvent.Backward)
@@ -228,13 +325,18 @@ class SongViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
         Log.i("myDebug", "ViewModel onCleared")
-        GlobalScope.launch(Main) {
-            musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)
-        }
+//        GlobalScope.launch(Main) {
+//            musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)
+//        }
     }
 
 
 }
+
+data class BitMapItem(
+    var bitmap: Bitmap? = null,
+    var bitmapStateFlow: MutableStateFlow<Bitmap?>
+)
 
 
 sealed class UIEvents {

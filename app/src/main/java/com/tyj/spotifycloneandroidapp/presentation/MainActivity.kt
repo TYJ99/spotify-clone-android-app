@@ -1,7 +1,6 @@
 package com.tyj.spotifycloneandroidapp.presentation
 
 import android.Manifest
-import android.app.Service
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -15,13 +14,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.media3.common.Player
 import androidx.media3.session.MediaSession
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
@@ -35,10 +34,7 @@ import com.tyj.spotifycloneandroidapp.presentation.ui.theme.SpotifyCloneAndroidA
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import kotlin.system.exitProcess
 
@@ -63,6 +59,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             SpotifyCloneAndroidAppTheme {
                 // A surface container using the 'background' color from the theme
+                // If you want to insert songs from external storage, ask for permission.
                 val permissionState = rememberPermissionState(
                     permission = Manifest.permission.READ_EXTERNAL_STORAGE
                 )
@@ -78,16 +75,22 @@ class MainActivity : ComponentActivity() {
                         lifecycleOwner.lifecycle.removeObserver(observer)
                     }
                 }
+
+                val songListState = viewModel.songList.collectAsStateWithLifecycle()
+                val currentSelectedSong by viewModel.currentSelectedSong.collectAsStateWithLifecycle()
+
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+
                     SongScreen(
                         progress = viewModel.progress,
                         onProgress = { viewModel.onUiEvents(UIEvents.SeekTo(it)) },
                         isAudioPlaying = viewModel.isPlaying,
-                        songList = viewModel.songList.collectAsStateWithLifecycle().value,
-                        currentPlayingAudio = viewModel.currentSelectedSong.collectAsStateWithLifecycle().value,
+                        songListState = songListState,
+                        currentPlayingAudio = currentSelectedSong,
                         onStart = {
                             viewModel.onUiEvents(UIEvents.PlayPause)
                         },
@@ -97,9 +100,16 @@ class MainActivity : ComponentActivity() {
                         },
                         onNext = {
                             viewModel.onUiEvents(UIEvents.SeekToNext)
+                        },
+                        onLoadSongImage = { context, song ->
+                            viewModel.loadSongImage(context, song)
                         }
                     )
+
+
+
                 }
+
             }
         }
     }
@@ -132,7 +142,7 @@ class MainActivity : ComponentActivity() {
         super.onDestroy()
         Log.i("myDebug", "MainActivity onDestroy")
         isServiceRunning = false
-        val job = CoroutineScope(Dispatchers.Main).launch {
+        CoroutineScope(Dispatchers.Main).launch {
             val job = launch {
                 musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)
                 stopSpotifyMusicService()
