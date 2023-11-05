@@ -78,6 +78,7 @@ class MainActivity : ComponentActivity() {
 
                 val songListState = viewModel.songList.collectAsStateWithLifecycle()
                 val currentSelectedSong by viewModel.currentSelectedSong.collectAsStateWithLifecycle()
+                val toggleState by viewModel.traditionalPlayerToggle.collectAsStateWithLifecycle()
 
 
                 Surface(
@@ -88,24 +89,33 @@ class MainActivity : ComponentActivity() {
                     SongScreen(
                         progress = viewModel.progress,
                         onProgress = { viewModel.onUiEvents(UIEvents.SeekTo(it)) },
+                        currPlayingSong = currentSelectedSong,
                         isAudioPlaying = viewModel.isPlaying,
                         songListState = songListState,
-                        currentPlayingAudio = currentSelectedSong,
                         onStart = {
                             viewModel.onUiEvents(UIEvents.PlayPause)
                         },
-                        onItemClick = {
-                            viewModel.onUiEvents(UIEvents.SelectedSongChange(it))
+                        onItemClickOrSwipe = { index, isClickSong, traditionalPlayerToggle ->
+                            viewModel.onUiEvents(
+                                uiEvents =  UIEvents.SelectedSongChange(index),
+                                isClickSong = isClickSong,
+                                traditionalPlayerToggle = traditionalPlayerToggle,
+                            )
                             startService()
                         },
                         onNext = {
                             viewModel.onUiEvents(UIEvents.SeekToNext)
                         },
+                        onPrevious = {
+                            viewModel.onUiEvents(UIEvents.SeekToPrevious)
+                        },
                         onLoadSongImage = { context, song ->
                             viewModel.loadSongImage(context, song)
-                        }
-                    )
-
+                        },
+                        toggleState = toggleState
+                    ) { toggleState ->
+                        viewModel.onTraditionalPlayerToggle(toggleState)
+                    }
 
 
                 }

@@ -1,16 +1,10 @@
 package com.tyj.spotifycloneandroidapp.domain.exoplayer.service
 
-import android.app.Service
-import android.content.Intent
-import android.os.Build
 import android.util.Log
-import androidx.core.content.ContextCompat
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
-import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.session.MediaSession
-import com.google.api.Context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,8 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SpotifyMusicServiceHandler @Inject constructor(
-    private val mediaSession: MediaSession,
-    private val spotifyMusicService: SpotifyMusicService
+    private val mediaSession: MediaSession
 ) : Player.Listener {
     private val _songState: MutableStateFlow<SongState> = MutableStateFlow(SongState.Initial)
     val songState: StateFlow<SongState> = _songState.asStateFlow()
@@ -51,28 +44,57 @@ class SpotifyMusicServiceHandler @Inject constructor(
         playerEvent: PlayerEvent,
         selectedSongIndex: Int = -1,
         seekPosition: Long = 0,
+        isClickSong: Boolean = true,
+        traditionalPlayerToggle: Boolean = false
     ) {
         when (playerEvent) {
             PlayerEvent.Backward -> exoPlayer.seekBack()
             PlayerEvent.Forward -> exoPlayer.seekForward()
-            PlayerEvent.SeekToNext -> exoPlayer.seekToNext()
+            PlayerEvent.SeekToNext -> {
+                if(!exoPlayer.isPlaying) exoPlayer.playWhenReady = true
+                exoPlayer.seekToNext()
+            }
+            PlayerEvent.SeekToPrevious -> {
+                if(!exoPlayer.isPlaying) exoPlayer.playWhenReady = true
+                exoPlayer.seekToPrevious()
+            }
             PlayerEvent.PlayPause -> playOrPause()
             PlayerEvent.SeekTo -> exoPlayer.seekTo(seekPosition)
             PlayerEvent.SelectedSongChange -> {
-                when (selectedSongIndex) {
-                    exoPlayer.currentMediaItemIndex -> {
-                        playOrPause()
-                    }
+                Log.i("myDebugPager", "exoPlayer.currentMediaItemIndex: ${exoPlayer.currentMediaItemIndex}")
+                Log.i("myDebugPager", "selectedSongIndex: $selectedSongIndex")
+                Log.i("myDebugPager", "isClickSong: $isClickSong")
+                Log.i("myDebugPager", "traditionalPlayerToggle: $traditionalPlayerToggle")
 
-                    else -> {
-                        exoPlayer.seekToDefaultPosition(selectedSongIndex)
-                        _songState.value = SongState.Playing(
-                            isPlaying = true
-                        )
-                        exoPlayer.playWhenReady = true
-                        startProgressUpdate()
+                if(!isClickSong && !traditionalPlayerToggle) {
+                    exoPlayer.seekToDefaultPosition(selectedSongIndex)
+                    _songState.value = SongState.Playing(
+                        isPlaying = true
+                    )
+                    exoPlayer.playWhenReady = true
+                    startProgressUpdate()
+                }
+                else if(isClickSong) {
+                    when (selectedSongIndex) {
+                        exoPlayer.currentMediaItemIndex -> {
+                            playOrPause()
+                        }
+
+                        else -> {
+                            if(traditionalPlayerToggle) {
+                                exoPlayer.seekToDefaultPosition(selectedSongIndex)
+                                _songState.value = SongState.Playing(
+                                    isPlaying = true
+                                )
+                                exoPlayer.playWhenReady = true
+                                startProgressUpdate()
+                            } else {
+                                _songState.value = SongState.CurrentPlaying(selectedSongIndex)
+                            }
+                        }
                     }
                 }
+
             }
 
             PlayerEvent.Stop -> {
@@ -100,7 +122,9 @@ class SpotifyMusicServiceHandler @Inject constructor(
 
     override fun onIsPlayingChanged(isPlaying: Boolean) {
         _songState.value = SongState.Playing(isPlaying = isPlaying)
+        Log.i("myDebugPager", "onIsPlayingChanged, _songState.value: ${_songState.value}")
         _songState.value = SongState.CurrentPlaying(exoPlayer.currentMediaItemIndex)
+        Log.i("myDebugPager", "onIsPlayingChanged, _songState.value: ${_songState.value}")
         if (isPlaying) {
             CoroutineScope(Dispatchers.Main).launch {
                 startProgressUpdate()
@@ -112,10 +136,13 @@ class SpotifyMusicServiceHandler @Inject constructor(
 
     private suspend fun playOrPause() {
         if (exoPlayer.isPlaying) {
+            Log.i("myDebugPager", "in playOrPause, isPlaying: ${exoPlayer.isPlaying}")
             exoPlayer.pause()
             stopProgressUpdate()
         } else {
+            Log.i("myDebugPager", "in playOrPause, isPlaying: ${exoPlayer.isPlaying}")
             exoPlayer.play()
+            delay(100L)
             _songState.value = SongState.Playing(
                 isPlaying = true
             )
@@ -158,6 +185,7 @@ sealed class PlayerEvent {
     object SelectedSongChange : PlayerEvent()
     object Backward : PlayerEvent()
     object SeekToNext : PlayerEvent()
+    object SeekToPrevious : PlayerEvent()
     object Forward : PlayerEvent()
     object SeekTo : PlayerEvent()
     object Stop : PlayerEvent()

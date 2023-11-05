@@ -42,7 +42,8 @@ fun PlayerIconItem(
         ) {
             Icon(
                 imageVector = icon,
-                contentDescription = null
+                contentDescription = null,
+                modifier = modifier,
             )
         }
     }

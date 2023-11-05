@@ -57,6 +57,9 @@ class SongViewModel @Inject constructor(
     private val _songList: MutableStateFlow<List<Song>> = MutableStateFlow(listOf<Song>())
     val songList: StateFlow<List<Song>> = _songList.asStateFlow()
 
+    private val _traditionalPlayerToggle: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val traditionalPlayerToggle: StateFlow<Boolean> = _traditionalPlayerToggle.asStateFlow()
+
     /*
     private val _songImage: MutableStateFlow<Bitmap?> = MutableStateFlow(null)
     val songImage: StateFlow<Bitmap?> = _songImage.asStateFlow()
@@ -98,18 +101,23 @@ class SongViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             musicServiceHandler.songState.collectLatest { songState ->
+                //Log.i("myDebugPager","In SongViewModel Collect, songState: $songState")
                 when (songState) {
-                    SongState.Initial -> _uiState.value = UIState.Initial
+                    SongState.Initial -> {
+                        _uiState.value = UIState.Initial
+                    }
                     is SongState.Buffering -> calculateProgressValue(songState.progress)
                     is SongState.Playing -> isPlaying = songState.isPlaying
                     is SongState.Progress -> calculateProgressValue(songState.progress)
                     is SongState.CurrentPlaying -> {
                         _currentSelectedSong.value = _songList.value[songState.mediaItemIndex]
+                        //Log.i("myDebugPager", "SongState.CurrentPlaying. _currentSelectedSong: ${_currentSelectedSong.value}")
                     }
 
                     is SongState.Ready -> {
                         duration = songState.duration
                         _uiState.value = UIState.Ready
+                        // if(_songList.value.isNotEmpty()) _currentSelectedSong.value = _songList.value[0]
                     }
                 }
             }
@@ -117,7 +125,6 @@ class SongViewModel @Inject constructor(
 
         }
     }
-
 
     private fun loadAudioData() {
         viewModelScope.launch {
@@ -189,6 +196,10 @@ class SongViewModel @Inject constructor(
             if (currentProgress > 0) ((currentProgress.toFloat() / duration.toFloat()) * 100f)
             else 0f
         progressString = formatDuration(currentProgress)
+    }
+
+    fun onTraditionalPlayerToggle(toggleOn: Boolean) {
+        _traditionalPlayerToggle.value = toggleOn
     }
 
     fun loadSongImage(context: Context, song: Song): StateFlow<Bitmap?> {
@@ -279,11 +290,20 @@ class SongViewModel @Inject constructor(
         return mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.asStateFlow()
     }
 
-    fun onUiEvents(uiEvents: UIEvents) = viewModelScope.launch {
+    fun onUiEvents(
+        uiEvents: UIEvents,
+        isClickSong: Boolean = true,
+        traditionalPlayerToggle: Boolean = false,
+    ) = viewModelScope.launch {
         when (uiEvents) {
             UIEvents.Backward -> musicServiceHandler.onPlayerEvents(PlayerEvent.Backward)
             UIEvents.Forward -> musicServiceHandler.onPlayerEvents(PlayerEvent.Forward)
-            UIEvents.SeekToNext -> musicServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
+            UIEvents.SeekToNext -> {
+                musicServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)
+            }
+            UIEvents.SeekToPrevious -> {
+                musicServiceHandler.onPlayerEvents(PlayerEvent.SeekToPrevious)
+            }
             is UIEvents.PlayPause -> {
                 musicServiceHandler.onPlayerEvents(
                     PlayerEvent.PlayPause
@@ -299,8 +319,10 @@ class SongViewModel @Inject constructor(
 
             is UIEvents.SelectedSongChange -> {
                 musicServiceHandler.onPlayerEvents(
-                    PlayerEvent.SelectedSongChange,
-                    selectedSongIndex = uiEvents.index
+                    playerEvent = PlayerEvent.SelectedSongChange,
+                    selectedSongIndex = uiEvents.index,
+                    isClickSong = isClickSong,
+                    traditionalPlayerToggle = traditionalPlayerToggle,
                 )
             }
 
@@ -344,6 +366,7 @@ sealed class UIEvents {
     data class SelectedSongChange(val index: Int) : UIEvents()
     data class SeekTo(val position: Float) : UIEvents()
     object SeekToNext : UIEvents()
+    object SeekToPrevious : UIEvents()
     object Backward : UIEvents()
     object Forward : UIEvents()
     data class UpdateProgress(val newProgress: Float) : UIEvents()

@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.screens.song.components.AudioItem
 import com.tyj.spotifycloneandroidapp.presentation.screens.song.components.BottomBarPlayer
+import com.tyj.spotifycloneandroidapp.presentation.screens.song.components.SongScreenTopBar
 import com.tyj.spotifycloneandroidapp.presentation.ui.theme.SpotifyCloneAndroidAppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,13 +26,16 @@ import kotlinx.coroutines.flow.StateFlow
 fun SongScreen(
     progress: Float,
     onProgress: (Float) -> Unit,
+    currPlayingSong: Song,
     isAudioPlaying: Boolean,
-    currentPlayingAudio: Song,
     songListState: State<List<Song>>,
     onStart: () -> Unit,
-    onItemClick: (Int) -> Unit,
+    onItemClickOrSwipe: (Int, Boolean, Boolean) -> Unit,
     onNext: () -> Unit,
-    onLoadSongImage: (Context, Song) -> StateFlow<Bitmap?>
+    onPrevious: () -> Unit,
+    onLoadSongImage: (Context, Song) -> StateFlow<Bitmap?>,
+    toggleState: Boolean,
+    onToggle: (Boolean) -> Unit,
 ) {
     val songList by songListState
     val lazyColumnState = rememberLazyListState()
@@ -48,15 +52,26 @@ fun SongScreen(
      */
 
     Scaffold(
+        topBar = {
+            SongScreenTopBar(
+                toggleState = toggleState,
+                onToggle = onToggle,
+            )
+        },
         bottomBar = {
             BottomBarPlayer(
                 progress = progress,
                 onProgress = onProgress,
-                song = currentPlayingAudio,
+                isAudioPlaying = isAudioPlaying,
                 onStart = onStart,
                 onNext = onNext,
-                isAudioPlaying = isAudioPlaying
-            )
+                onPrevious = onPrevious,
+                currPlayingSong = currPlayingSong,
+                songList = songList,
+                traditionalPlayerToggle = toggleState,
+            ) { page ->
+                onItemClickOrSwipe(page, false, toggleState)
+            }
         }
     ) {
 
@@ -69,7 +84,7 @@ fun SongScreen(
                 AudioItem(
                     song = song,
                     onItemClick = {
-                        onItemClick(index)
+                        onItemClickOrSwipe(index, true, toggleState)
                     },
                     onLoadSongImage = onLoadSongImage
                 )
@@ -214,6 +229,7 @@ fun SongScreenPrev() {
         SongScreen(
             progress = 50f,
             onProgress = {},
+            currPlayingSong = Song("1", "Title One", "Artist 1", "", ""),
             isAudioPlaying = true,
             songListState = remember {
                 mutableStateOf(listOf(
@@ -221,11 +237,12 @@ fun SongScreenPrev() {
                 Song("2", "Title Two", "Artist 2", "", ""),
             ))
             },
-            currentPlayingAudio = Song("", "Title One", "Artist 1", "", ""),
             onStart = {},
-            onItemClick = {},
+            onItemClickOrSwipe = {_,_,_ -> Unit},
             onNext = {},
-            onLoadSongImage = { _, _ -> MutableStateFlow<Bitmap?>(null) }
-        )
+            onPrevious = {},
+            onLoadSongImage = { _, _ -> MutableStateFlow<Bitmap?>(null) },
+            toggleState = false
+        ) { _ -> Unit }
     }
 }

@@ -17,7 +17,6 @@ import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_CHANNEL_ID
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_CHANNEL_NAME
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_ID
-import com.tyj.spotifycloneandroidapp.domain.exoplayer.callbacks.SpotifyMusicPlayerNotificationListener
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
@@ -77,9 +76,14 @@ class SpotifyMusicNotificationManager  @Inject constructor(
             .build()
             .also {
                 it.setMediaSessionToken(mediaSession.sessionCompatToken)
-                it.setUseFastForwardActionInCompactView(true)
-                it.setUseRewindActionInCompactView(true)
+                // it.setUseFastForwardAction(true)
+                // it.setUseFastForwardActionInCompactView(true)
+                // it.setUseRewindAction(true)
+                // it.setUseRewindActionInCompactView(true)
+                it.setUseNextAction(true)
                 it.setUseNextActionInCompactView(true)
+                it.setUsePreviousAction(true)
+                it.setUsePreviousActionInCompactView(true)
                 it.setPriority(NotificationCompat.PRIORITY_LOW)
                 it.setPlayer(exoPlayer)
             }

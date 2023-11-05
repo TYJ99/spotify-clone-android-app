@@ -186,7 +186,8 @@ dependencies {
      */
 
     // Firebase Firestore
-    implementation("com.google.firebase:firebase-firestore:24.9.0")
+//    implementation("com.google.firebase:firebase-firestore:24.9.0")
+    implementation("com.google.firebase:firebase-firestore:24.9.1")
 
     // Firebase Storage KTX
     implementation("com.google.firebase:firebase-storage-ktx:20.3.0")
