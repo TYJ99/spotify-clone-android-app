@@ -36,6 +36,7 @@ class SpotifyMusicService: MediaSessionService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         Log.i("myDebug", "onStartCommand")
         if(intent?.action == "STOP_SERVICE") {
+
             stopForeground(Service.STOP_FOREGROUND_REMOVE)
             //isForegroundService = false
             stopSelf()

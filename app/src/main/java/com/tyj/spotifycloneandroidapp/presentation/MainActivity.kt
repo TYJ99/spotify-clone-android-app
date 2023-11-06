@@ -161,18 +161,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+
     override fun onDestroy() {
         super.onDestroy()
         Log.i("myDebug", "MainActivity onDestroy")
-        isServiceRunning = false
-        CoroutineScope(Dispatchers.Main).launch {
-            val job = launch {
-                musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)
-                stopSpotifyMusicService()
+        if(isServiceRunning) {
+            isServiceRunning = false
+            CoroutineScope(Dispatchers.Main).launch {
+                val job = launch {
+                    musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)
+                    stopSpotifyMusicService()
+                }
+                job.join()
+                exitProcess(0)
             }
-            job.join()
+        } else {
             exitProcess(0)
         }
+
 
 //        GlobalScope.launch(Dispatchers.Main) {
 //            musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)

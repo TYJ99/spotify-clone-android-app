@@ -7,8 +7,10 @@ import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 
 @Composable
 fun BackPressHandler(
@@ -17,10 +19,12 @@ fun BackPressHandler(
     onBackPressed: () -> Unit,
 ) {
     val currentOnBackPressed by rememberUpdatedState(newValue = onBackPressed)
+    var enabled by remember { mutableStateOf(true) }
 
     val backCallback = remember {
-        object : OnBackPressedCallback(true) {
+        object : OnBackPressedCallback(enabled) {
             override fun handleOnBackPressed() {
+                enabled = false
                 Log.i("myDebugPressBackButton", "BackPressHandler: backCallback: handleOnBackPressed")
                 currentOnBackPressed()
             }

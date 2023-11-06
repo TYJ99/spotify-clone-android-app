@@ -2,6 +2,7 @@ package com.tyj.spotifycloneandroidapp.presentation.screens.home
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.lazy.LazyColumn
@@ -18,6 +19,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.tyj.spotifycloneandroidapp.common.BackInvokeHandler
 import com.tyj.spotifycloneandroidapp.common.BackPressHandler
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.MainActivity
@@ -72,17 +74,31 @@ fun HomeScreen(
     }
 
     val onBackPressed = { activity.moveTaskToBack(true) }
-    Log.i("myDebugPressBackButton", "On Home Screen")
 
-//    BackHandler(enabled = true) {
-//        Log.i("myDebugPressBackButton", "handle back pressed")
-//        onBackPressed()
-//    }
+    //val onBackPressed = { activity.onBackPressedDispatcher.onBackPressed() }
+
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+        BackInvokeHandler(
+            handleBackHandler = true,
+            onBackPressed = {
+                onBackPressed()
+            }
+        )
+    } else {
+        BackHandler(enabled = true) {
+            Log.i("myDebugPressBackButton", "On Home Screen")
+            Log.i("myDebugPressBackButton", "handle back pressed")
+            onBackPressed()
+        }
+    }
 
 
-    BackPressHandler(
-        onBackPressed = { onBackPressed() },
-    )
+
+
+//    BackPressHandler(
+//        onBackPressed = { onBackPressed() },
+//    )
 
     Scaffold(
         topBar = {

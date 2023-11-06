@@ -2,6 +2,7 @@ package com.tyj.spotifycloneandroidapp.presentation.screens.song
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.tyj.spotifycloneandroidapp.common.BackInvokeHandler
 import com.tyj.spotifycloneandroidapp.common.BackPressHandler
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.screens.song.components.SongImageOnPlayingSongScreen
@@ -45,16 +47,27 @@ fun SongScreen(
 ) {
 
     val onBackPressed = { navController.popBackStack() }
-    Log.i("myDebugPressBackButton", "On Song Screen")
 
-//    BackHandler(enabled = true) {
-//        Log.i("myDebugPressBackButton", "handle back pressed")
-//        onBackPressed()
-//    }
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        BackInvokeHandler(
+            handleBackHandler = true,
+            onBackPressed = {
+                onBackPressed()
+            }
+        )
+    } else {
+        BackHandler(enabled = true) {
+            Log.i("myDebugPressBackButton", "On Song Screen")
+            Log.i("myDebugPressBackButton", "handle back pressed")
+            onBackPressed()
+        }
+    }
 
-    BackPressHandler(
-        onBackPressed = { onBackPressed() },
-    )
+
+
+//    BackPressHandler(
+//        onBackPressed = { onBackPressed() },
+//    )
 
     Scaffold(
         topBar = {

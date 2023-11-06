@@ -139,7 +139,7 @@ dependencies {
     implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
     // Compose Navigation
-    implementation("androidx.navigation:navigation-compose:2.5.1")
+    implementation("androidx.navigation:navigation-compose:2.6.0")
 
     // FlowRow
     implementation ("com.google.accompanist:accompanist-flowlayout:0.17.0")
@@ -175,9 +175,10 @@ dependencies {
 
     // Glide
     implementation("com.github.bumptech.glide:glide:4.15.1")
-//    ksp("com.github.bumptech.glide:ksp:4.11.0")
-//    implementation("com.github.bumptech.glide:glide:4.11.0")
-//    kapt("com.github.bumptech.glide:compiler:4.11.0")
+    //ksp("com.github.bumptech.glide:ksp:4.11.0")
+    //implementation("com.github.bumptech.glide:glide:4.11.0")
+    kapt("com.github.bumptech.glide:compiler:4.15.1")
+    //ksp("com.github.bumptech.glide:ksp:4.15.1")
 
     /*
     // Timber
