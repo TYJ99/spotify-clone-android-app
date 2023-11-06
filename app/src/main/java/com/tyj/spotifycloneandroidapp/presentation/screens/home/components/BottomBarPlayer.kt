@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.presentation.screens.song.components
+package com.tyj.spotifycloneandroidapp.presentation.screens.home.components
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,6 +13,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.rememberNavController
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.ui.theme.SpotifyCloneAndroidAppTheme
 
@@ -28,6 +30,7 @@ fun BottomBarPlayer(
     songList: List<Song>,
     traditionalPlayerToggle: Boolean,
     onPagerSwipe: (Int) -> Unit,
+    navController: NavHostController
 ) {
 
     BottomAppBar(
@@ -48,6 +51,7 @@ fun BottomBarPlayer(
                         songList = songList,
                         traditionalPlayerToggle = traditionalPlayerToggle,
                         onPagerSwipe = onPagerSwipe,
+                        navController = navController
                     )
                     Spacer(modifier = Modifier.size(4.dp))
                     MediaPlayerController(
@@ -95,7 +99,9 @@ fun BottomBarPlayerPrev() {
 
             ),
             traditionalPlayerToggle = true,
-        ) {}
+            onPagerSwipe = {},
+            navController = rememberNavController()
+        )
 
     }
 

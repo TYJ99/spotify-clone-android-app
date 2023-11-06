@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.presentation.screens.song.components
+package com.tyj.spotifycloneandroidapp.presentation.screens.home.components
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -30,6 +30,7 @@ fun ArtistInfoPager(
     currPlayingSong: Song,
     onPagerSwipe: (Int) -> Unit,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit,
 ) {
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
@@ -48,7 +49,7 @@ fun ArtistInfoPager(
         state = pagerState,
         key = { songList[it].mediaId },
         pageSize = PageSize.Fill,
-        modifier = modifier
+        modifier = modifier,
 
     ) { page ->
         val song = songList[page]
@@ -57,7 +58,13 @@ fun ArtistInfoPager(
             loadImage(LocalContext.current, song)
         }
 
-        ArtistInfo(songImage = songImage, song = song)
+        ArtistInfo(
+            songImage = songImage,
+            song = song,
+            onClick = {
+                onClick()
+            },
+        )
     }
 
     LaunchedEffect(currPlayingSongPage) {

@@ -18,8 +18,6 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ServiceScoped
-import dagger.hilt.android.scopes.ViewModelScoped
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -56,6 +54,8 @@ object AppModule {
         .setAudioAttributes(audioAttributes, true)
         .setHandleAudioBecomingNoisy(true)
         .setTrackSelector(DefaultTrackSelector(context))
+        .setSeekForwardIncrementMs(5000L)
+        .setSeekBackIncrementMs(5000L)
         .build()
 
     @Singleton

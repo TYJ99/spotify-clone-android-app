@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.presentation.screens.song.components
+package com.tyj.spotifycloneandroidapp.presentation.screens.home.components
 
 import android.content.Context
 import android.graphics.Bitmap

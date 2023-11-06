@@ -1,9 +1,10 @@
-package com.tyj.spotifycloneandroidapp.presentation.screens.song.components
+package com.tyj.spotifycloneandroidapp.presentation.screens.home.components
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.basicMarquee
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,10 +26,15 @@ import com.tyj.spotifycloneandroidapp.domain.model.Song
 fun ArtistInfo(
     modifier: Modifier = Modifier,
     songImage: Bitmap?,
-    song: Song
+    song: Song,
+    onClick: () -> Unit
 ) {
     Row(
-        modifier = modifier.padding(4.dp),
+        modifier = modifier
+            .padding(4.dp)
+            .clickable {
+                onClick()
+            },
         verticalAlignment = Alignment.CenterVertically
     ) {
         PlayerImageItem(

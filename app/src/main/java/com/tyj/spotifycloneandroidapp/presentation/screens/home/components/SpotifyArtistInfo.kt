@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.presentation.screens.song.components
+package com.tyj.spotifycloneandroidapp.presentation.screens.home.components
 
 import android.content.Context
 import android.graphics.Bitmap
@@ -14,11 +14,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.navigation.NavHostController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.GlideException
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.tyj.spotifycloneandroidapp.domain.model.Song
+import com.tyj.spotifycloneandroidapp.presentation.navigation.Screen
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -28,6 +30,7 @@ fun SpotifyArtistInfo(
     songList: List<Song>,
     traditionalPlayerToggle: Boolean,
     onPagerSwipe: (Int) -> Unit,
+    navController: NavHostController,
 ) {
     // val pagerState = rememberPagerState()
     var mediaIdBitmapMap: Map<String, Bitmap?> by remember { mutableStateOf(mapOf()) }
@@ -70,6 +73,11 @@ fun SpotifyArtistInfo(
             Log.i("myDebug", "error: ${glideException.rootCauses}")
         }
     }
+
+    fun navigateToTargetScreen() {
+        navController.navigate(Screen.PlayingSong.route)
+    }
+
     val song = if(currPlayingSong.mediaId == "" && songList.isNotEmpty()){
         songList[0]
     } else {
@@ -86,6 +94,9 @@ fun SpotifyArtistInfo(
             currPlayingSong = currPlayingSong,
             onPagerSwipe = onPagerSwipe,
             modifier = modifier,
+            onClick = {
+                navigateToTargetScreen()
+            },
         )
     }else {
         val songImage = mediaIdBitmapMap[song.mediaId]
@@ -97,7 +108,10 @@ fun SpotifyArtistInfo(
         ArtistInfo(
             songImage = songImage,
             song = song,
-            modifier = modifier
+            modifier = modifier,
+            onClick = {
+                navigateToTargetScreen()
+            },
         )
     }
 

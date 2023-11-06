@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.presentation.screens.song.components
+package com.tyj.spotifycloneandroidapp.presentation.screens.home.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row

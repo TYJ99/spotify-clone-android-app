@@ -22,14 +22,14 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.session.MediaSession
+import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.PlayerEvent
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicService
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler
-import com.tyj.spotifycloneandroidapp.presentation.screens.song.SongScreen
-import com.tyj.spotifycloneandroidapp.presentation.screens.song.SongViewModel
-import com.tyj.spotifycloneandroidapp.presentation.screens.song.UIEvents
+import com.tyj.spotifycloneandroidapp.presentation.navigation.SetupNavGraph
+import com.tyj.spotifycloneandroidapp.presentation.screens.home.HomeViewModel
 import com.tyj.spotifycloneandroidapp.presentation.ui.theme.SpotifyCloneAndroidAppTheme
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -40,7 +40,7 @@ import kotlin.system.exitProcess
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: SongViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels()
     private var isServiceRunning = false
 
     @Inject
@@ -79,6 +79,7 @@ class MainActivity : ComponentActivity() {
                 val songListState = viewModel.songList.collectAsStateWithLifecycle()
                 val currentSelectedSong by viewModel.currentSelectedSong.collectAsStateWithLifecycle()
                 val toggleState by viewModel.traditionalPlayerToggle.collectAsStateWithLifecycle()
+                val navController = rememberNavController()
 
 
                 Surface(
@@ -86,7 +87,15 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
 
-                    SongScreen(
+                    SetupNavGraph(
+                        navController = navController,
+                        startService = {
+                            startService()
+                        },
+                    )
+
+                    /*
+                    HomeScreen(
                         progress = viewModel.progress,
                         onProgress = { viewModel.onUiEvents(UIEvents.SeekTo(it)) },
                         currPlayingSong = currentSelectedSong,
@@ -112,10 +121,14 @@ class MainActivity : ComponentActivity() {
                         onLoadSongImage = { context, song ->
                             viewModel.loadSongImage(context, song)
                         },
-                        toggleState = toggleState
-                    ) { toggleState ->
-                        viewModel.onTraditionalPlayerToggle(toggleState)
-                    }
+                        toggleState = toggleState,
+                        onToggle = { toggleState ->
+                            viewModel.onTraditionalPlayerToggle(toggleState)
+                        },
+                        navController = navController,
+                    )
+
+                     */
 
 
                 }

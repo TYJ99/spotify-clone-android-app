@@ -17,14 +17,12 @@ import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_CHANNEL_ID
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_CHANNEL_NAME
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_ID
-import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicService
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 
 class SpotifyMusicNotificationManager  @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val exoPlayer: ExoPlayer,
-    private val spotifyMusicService: SpotifyMusicService
+    private val exoPlayer: ExoPlayer
 ) {
     private val notificationManager: NotificationManagerCompat =
         NotificationManagerCompat.from(context)
