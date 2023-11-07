@@ -45,7 +45,9 @@ class SpotifyMusicServiceHandler @Inject constructor(
         selectedSongIndex: Int = -1,
         seekPosition: Long = 0,
         isClickSong: Boolean = true,
-        traditionalPlayerToggle: Boolean = false
+        traditionalPlayerToggle: Boolean = false,
+        getBackFromSongScreen: Boolean = false,
+        toggleFromTraditionalPlayer: Boolean = false,
     ) {
         when (playerEvent) {
             PlayerEvent.Backward -> exoPlayer.seekBack()
@@ -66,7 +68,10 @@ class SpotifyMusicServiceHandler @Inject constructor(
                 Log.i("myDebugPager", "isClickSong: $isClickSong")
                 Log.i("myDebugPager", "traditionalPlayerToggle: $traditionalPlayerToggle")
 
-                if(!isClickSong && !traditionalPlayerToggle) {
+                if((getBackFromSongScreen && !traditionalPlayerToggle) || toggleFromTraditionalPlayer) {
+                    return
+                }
+                else if(!isClickSong && !traditionalPlayerToggle) {
                     exoPlayer.seekToDefaultPosition(selectedSongIndex)
                     _songState.value = SongState.Playing(
                         isPlaying = true

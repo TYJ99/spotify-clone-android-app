@@ -15,6 +15,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.tyj.spotifycloneandroidapp.presentation.ui.theme.SpotifyCloneAndroidAppTheme
 
 @Composable
 fun MediaPlayerController(
@@ -35,10 +36,14 @@ fun MediaPlayerController(
          */
         modifier = modifier
     ) {
+        val iconSize = Modifier
+            .weight(1f)
+
         if(traditionalPlayerToggle) {
             Icon(
                 imageVector = Icons.Default.SkipPrevious,
-                modifier = Modifier.clickable {
+                modifier = iconSize
+                    .clickable {
                     onPrevious()
                 },
                 contentDescription = "SkipPrevious button on the Bottom Bar Media player controller"
@@ -48,7 +53,7 @@ fun MediaPlayerController(
         PlayerIconItem(
             icon = if (isAudioPlaying) Icons.Default.Pause
             else Icons.Default.PlayArrow,
-            modifier = if(!traditionalPlayerToggle) modifier.size(50.dp) else Modifier
+            modifier = if(!traditionalPlayerToggle) modifier.size(50.dp) else iconSize
         ) {
             onStart()
         }
@@ -56,7 +61,8 @@ fun MediaPlayerController(
         if(traditionalPlayerToggle) {
             Icon(
                 imageVector = Icons.Default.SkipNext,
-                modifier = Modifier.clickable {
+                modifier = iconSize
+                    .clickable {
                     onNext()
                 },
                 contentDescription = "SkipNext button on the Bottom Bar Media player controller"
@@ -67,15 +73,17 @@ fun MediaPlayerController(
     }
 }
 
-@Preview(showSystemUi = true)
+@Preview
 @Composable
 fun MediaPlayerControlPrev() {
-    MediaPlayerController(
-        modifier = Modifier,
-        isAudioPlaying = false,
-        traditionalPlayerToggle = true,
-        onStart = {},
-        onNext = {},
-        onPrevious = {},
-    )
+    SpotifyCloneAndroidAppTheme {
+        MediaPlayerController(
+            modifier = Modifier,
+            isAudioPlaying = false,
+            traditionalPlayerToggle = true,
+            onStart = {},
+            onNext = {},
+            onPrevious = {},
+        )
+    }
 }

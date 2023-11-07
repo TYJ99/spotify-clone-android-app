@@ -13,10 +13,11 @@ import androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi
 import androidx.lifecycle.viewmodel.compose.saveable
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.tyj.spotifycloneandroidapp.GlideApp
 import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.PlayerEvent
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SongState
@@ -61,7 +62,7 @@ class HomeViewModel @Inject constructor(
     val traditionalPlayerToggle: StateFlow<Boolean> = _traditionalPlayerToggle.asStateFlow()
 
 
-    var shouldHandleBackPressed = false
+    var shouldHandleBackPressed = true
         private set
 
     /*
@@ -212,6 +213,10 @@ class HomeViewModel @Inject constructor(
 
     fun loadSongImage(context: Context, song: Song): StateFlow<Bitmap?> {
         val bitMapItem = mediaIdBitmapItemMap[song.mediaId]
+        val requestOptions = RequestOptions()
+            .placeholder(R.drawable.ic_music)
+            .error(R.drawable.ic_music)
+
         bitMapItem?.let { bitmapItem ->
             Log.i("myDebug", "loadSongImage, mediaIdBitmapItemMap: $mediaIdBitmapItemMap")
             bitmapItem.bitmap?.let { bitmap ->
@@ -226,8 +231,9 @@ class HomeViewModel @Inject constructor(
 
         if(bitMapItem == null) {
             mediaIdBitmapItemMap[song.mediaId] = BitMapItem(null, MutableStateFlow(null))
+            /*
             // first load local default image
-            Glide.with(context)
+            GlideApp.with(context)
                 .asBitmap()
                 .load(R.drawable.load_holder)
                 .into(object : CustomTarget<Bitmap>() {
@@ -246,9 +252,11 @@ class HomeViewModel @Inject constructor(
                     override fun onLoadCleared(placeholder: Drawable?) = Unit
                 })
 
+             */
             try {
-                Glide.with(context)
+                GlideApp.with(context)
                     .asBitmap()
+                    .apply(requestOptions)
                     .load(song.imageUrl)
                     .into(object : CustomTarget<Bitmap>() {
                         override fun onResourceReady(
@@ -271,7 +279,7 @@ class HomeViewModel @Inject constructor(
             if(bitMapItem.bitmap == loadHolderBitmap) {
                 // load image from URL
                 try {
-                    Glide.with(context)
+                    GlideApp.with(context)
                         .asBitmap()
                         .load(song.imageUrl)
                         .into(object : CustomTarget<Bitmap>() {
@@ -302,6 +310,8 @@ class HomeViewModel @Inject constructor(
         uiEvents: UIEvents,
         isClickSong: Boolean = true,
         traditionalPlayerToggle: Boolean = false,
+        getBackFromSongScreen: Boolean = false,
+        toggleFromTraditionalPlayer: Boolean = false,
     ) = viewModelScope.launch {
         when (uiEvents) {
             UIEvents.Backward -> musicServiceHandler.onPlayerEvents(PlayerEvent.Backward)
@@ -331,6 +341,8 @@ class HomeViewModel @Inject constructor(
                     selectedSongIndex = uiEvents.index,
                     isClickSong = isClickSong,
                     traditionalPlayerToggle = traditionalPlayerToggle,
+                    getBackFromSongScreen = getBackFromSongScreen,
+                    toggleFromTraditionalPlayer = toggleFromTraditionalPlayer,
                 )
             }
 

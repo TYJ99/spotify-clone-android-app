@@ -8,9 +8,9 @@ import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import androidx.media3.common.Player
 import androidx.media3.ui.PlayerNotificationManager
-import com.bumptech.glide.Glide
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.tyj.spotifycloneandroidapp.GlideApp
 import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_CHANNEL_ID
 import com.tyj.spotifycloneandroidapp.common.Constants.NOTIFICATION_ID
@@ -81,7 +81,7 @@ class MusicNotificationManager(
             player: Player,
             callback: PlayerNotificationManager.BitmapCallback
         ): Bitmap? {
-            Glide.with(context).asBitmap()
+            GlideApp.with(context).asBitmap()
                 .load(mediaController.metadata.description.iconUri)
                 .into(object : CustomTarget<Bitmap>() {
                     override fun onResourceReady(

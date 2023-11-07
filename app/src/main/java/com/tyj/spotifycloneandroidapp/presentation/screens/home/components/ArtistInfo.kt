@@ -44,8 +44,9 @@ fun ArtistInfo(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.onSurface
             ),
+            onClick = onClick
             // modifier = Modifier.weight(1f)
-        ) {}
+        )
         Spacer(modifier = Modifier.size(10.dp))
         Column(
             Modifier.weight(1f)

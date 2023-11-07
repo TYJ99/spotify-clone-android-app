@@ -17,12 +17,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.tyj.spotifycloneandroidapp.common.BackInvokeHandler
-import com.tyj.spotifycloneandroidapp.common.BackPressHandler
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.MainActivity
+import com.tyj.spotifycloneandroidapp.presentation.navigation.Screen
 import com.tyj.spotifycloneandroidapp.presentation.screens.home.components.AudioItem
 import com.tyj.spotifycloneandroidapp.presentation.screens.home.components.BottomBarPlayer
 import com.tyj.spotifycloneandroidapp.presentation.screens.home.components.HomeScreenTopBar
@@ -39,13 +42,16 @@ fun HomeScreen(
     isAudioPlaying: Boolean,
     songListState: State<List<Song>>,
     onStart: () -> Unit,
-    onItemClickOrSwipe: (Int, Boolean, Boolean) -> Unit,
+    onItemClickOrSwipe: (Int, Boolean, Boolean, Boolean, Boolean) -> Unit,
     onNext: () -> Unit,
     onPrevious: () -> Unit,
     onLoadSongImage: (Context, Song) -> StateFlow<Bitmap?>,
     toggleState: Boolean,
     onToggle: (Boolean) -> Unit,
     navController: NavHostController,
+    navBackStackEntry: NavBackStackEntry,
+//    shouldHandleBackPressed: Boolean,
+//    setShouldHandleBackPressed: (Boolean) -> Unit
 ) {
     val songList by songListState
     val lazyColumnState = rememberLazyListState()
@@ -73,24 +79,58 @@ fun HomeScreen(
         }
     }
 
-    val onBackPressed = { activity.moveTaskToBack(true) }
+    val enabled = navBackStackEntry.savedStateHandle.get<Boolean>("enabled")
+    val shouldHandleBackPressed = enabled ?: true
+
+    val getBackFromSongScreen = navBackStackEntry.savedStateHandle.get<Boolean>("getBackFromSongScreen")
+    val backFromSongScreen = getBackFromSongScreen ?: false
+
+    val getPagerPlayer = navBackStackEntry.savedStateHandle.get<Boolean>("pagerPlayer")
+    val pagerPlayer = getPagerPlayer ?: true
+
+    //Log.i("myDebugPressBackButton", "On Home Screen")
+    //Log.i("myDebugPressBackButton", "current, shouldHandleBackPressed = $shouldHandleBackPressed")
+
+
+    var onBackPressed = { activity.moveTaskToBack(true) }
+    if(!shouldHandleBackPressed) onBackPressed = { true }
+
+
 
     //val onBackPressed = { activity.onBackPressedDispatcher.onBackPressed() }
 
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-
+    if(Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
         BackInvokeHandler(
             handleBackHandler = true,
             onBackPressed = {
                 onBackPressed()
             }
         )
-    } else {
+        if(!shouldHandleBackPressed) {
+            Log.i("myDebugPressBackButton", "before, shouldHandleBackPressed = ${navBackStackEntry.savedStateHandle.get<Boolean>("enabled")!!}")
+
+            navBackStackEntry.savedStateHandle.set<Boolean>("enabled", true)
+
+            Log.i("myDebugPressBackButton", "after, shouldHandleBackPressed = ${navBackStackEntry.savedStateHandle.get<Boolean>("enabled")!!}")
+        }
+    }
+    else {
         BackHandler(enabled = true) {
             Log.i("myDebugPressBackButton", "On Home Screen")
             Log.i("myDebugPressBackButton", "handle back pressed")
+
             onBackPressed()
         }
+
+        if(!shouldHandleBackPressed) {
+            Log.i("myDebugPressBackButton", "On Home Screen")
+            Log.i("myDebugPressBackButton", "before, shouldHandleBackPressed = ${navBackStackEntry.savedStateHandle.get<Boolean>("enabled")!!}")
+
+            navBackStackEntry.savedStateHandle.set<Boolean>("enabled", true)
+
+            Log.i("myDebugPressBackButton", "after, shouldHandleBackPressed = ${navBackStackEntry.savedStateHandle.get<Boolean>("enabled")!!}")
+        }
+
     }
 
 
@@ -111,6 +151,11 @@ fun HomeScreen(
             )
         },
         bottomBar = {
+            var toggleFromTraditionalPlayer = false
+            if(!pagerPlayer && !toggleState) {
+                toggleFromTraditionalPlayer = true
+            }
+
             BottomBarPlayer(
                 progress = progress,
                 onProgress = onProgress,
@@ -123,9 +168,17 @@ fun HomeScreen(
                 traditionalPlayerToggle = toggleState,
                 navController = navController,
                 onPagerSwipe = { page ->
-                    onItemClickOrSwipe(page, false, toggleState)
+                    onItemClickOrSwipe(
+                        page,
+                        false,
+                        toggleState,
+                        backFromSongScreen,
+                        toggleFromTraditionalPlayer,
+                    )
                 },
             )
+            if(backFromSongScreen) navBackStackEntry.savedStateHandle.set<Boolean>("getBackFromSongScreen", false)
+            navBackStackEntry.savedStateHandle["pagerPlayer"] = !toggleState
         }
     ) {
 
@@ -138,7 +191,7 @@ fun HomeScreen(
                 AudioItem(
                     song = song,
                     onItemClick = {
-                        onItemClickOrSwipe(index, true, toggleState)
+                        onItemClickOrSwipe(index, true, toggleState, false, false)
                     },
                     onLoadSongImage = onLoadSongImage
                 )
@@ -280,6 +333,16 @@ fun LazyColumnComponent(
 @Composable
 fun SongScreenPrev() {
     SpotifyCloneAndroidAppTheme {
+        var entry: NavBackStackEntry? = null
+        NavHost(
+            navController = rememberNavController(),
+            startDestination = Screen.Home.route,
+        ) {
+            composable(route = Screen.Home.route) {
+                entry = it
+            }
+        }
+
         HomeScreen(
             progress = 50f,
             onProgress = {},
@@ -292,13 +355,16 @@ fun SongScreenPrev() {
             ))
             },
             onStart = {},
-            onItemClickOrSwipe = {_,_,_ -> Unit},
+            onItemClickOrSwipe = {_,_,_,_,_ -> Unit},
             onNext = {},
             onPrevious = {},
             onLoadSongImage = { _, _ -> MutableStateFlow<Bitmap?>(null) },
             toggleState = false,
             onToggle = { _ -> Unit },
             navController = rememberNavController(),
+            navBackStackEntry = entry!!,
+//            shouldHandleBackPressed = true,
+//            setShouldHandleBackPressed = {_ -> Unit},
         )
     }
 }

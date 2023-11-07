@@ -5,8 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.Drawable
 import android.util.Log
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MusicNote
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -15,10 +13,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.GlideException
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.tyj.spotifycloneandroidapp.GlideApp
+import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.navigation.Screen
 
@@ -36,8 +36,13 @@ fun SpotifyArtistInfo(
     var mediaIdBitmapMap: Map<String, Bitmap?> by remember { mutableStateOf(mapOf()) }
 
     fun loadImage(context: Context, song: Song) {
-        Glide.with(context)
+        val requestOptions = RequestOptions()
+            .placeholder(R.drawable.ic_music)
+            .error(R.drawable.ic_music)
+        /*
+        GlideApp.with(context)
             .asBitmap()
+            .apply(requestOptions)
             .load(Icons.Default.MusicNote)
             .into(object : CustomTarget<Bitmap>() {
                 override fun onResourceReady(
@@ -52,9 +57,12 @@ fun SpotifyArtistInfo(
                 override fun onLoadCleared(placeholder: Drawable?) {}
             })
 
+         */
+
         try {
-            Glide.with(context)
+            GlideApp.with(context)
                 .asBitmap()
+                .apply(requestOptions)
                 .load(song.imageUrl)
                 .into(object : CustomTarget<Bitmap>() {
                     override fun onResourceReady(

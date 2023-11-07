@@ -7,10 +7,10 @@ import android.graphics.drawable.Drawable
 import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
+import com.tyj.spotifycloneandroidapp.GlideApp
 
 
 @UnstableApi
@@ -30,7 +30,7 @@ class SpotifyMusicNotificationAdapter(
         player: Player,
         callback: PlayerNotificationManager.BitmapCallback,
     ): Bitmap? {
-        Glide.with(context)
+        GlideApp.with(context)
             .asBitmap()
             .load(player.mediaMetadata.artworkUri)
             .diskCacheStrategy(DiskCacheStrategy.ALL)

@@ -21,7 +21,6 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.tyj.spotifycloneandroidapp.common.BackInvokeHandler
-import com.tyj.spotifycloneandroidapp.common.BackPressHandler
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.screens.song.components.SongImageOnPlayingSongScreen
 import com.tyj.spotifycloneandroidapp.presentation.screens.song.components.SongInfo
@@ -44,17 +43,27 @@ fun SongScreen(
     onRewind: () -> Unit,
     navController: NavHostController,
     songDuration: Long,
+//    shouldHandleBackPressed: Boolean,
+//    setShouldHandleBackPressed: (Boolean) -> Unit,
 ) {
 
-    val onBackPressed = { navController.popBackStack() }
+    val onBackPressed = {
+        navController.previousBackStackEntry
+            ?.savedStateHandle?.apply {
+                set("enabled", false)
+                set("getBackFromSongScreen", true)
+            }
+        navController.popBackStack()
+    }
 
-    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+    if(Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
         BackInvokeHandler(
             handleBackHandler = true,
             onBackPressed = {
                 onBackPressed()
             }
         )
+
     } else {
         BackHandler(enabled = true) {
             Log.i("myDebugPressBackButton", "On Song Screen")
@@ -157,5 +166,7 @@ fun SongScreenPrev(){
         onRewind = {},
         navController = rememberNavController(),
         songDuration = 186000L,
+//        shouldHandleBackPressed = true,
+//        setShouldHandleBackPressed = {_ -> Unit},
     )
 }

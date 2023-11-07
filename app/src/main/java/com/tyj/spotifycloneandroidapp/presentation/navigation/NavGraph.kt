@@ -29,7 +29,7 @@ fun SetupNavGraph(
         navController = navController,
         startDestination = Screen.Home.route,
     ) {
-        composable(route = Screen.Home.route){
+        composable(route = Screen.Home.route){ entry ->
 
             HomeScreen(
                 progress = homeViewModel.progress,
@@ -40,11 +40,13 @@ fun SetupNavGraph(
                 onStart = {
                     homeViewModel.onUiEvents(UIEvents.PlayPause)
                 },
-                onItemClickOrSwipe = { index, isClickSong, traditionalPlayerToggle ->
+                onItemClickOrSwipe = { index, isClickSong, traditionalPlayerToggle, getBackFromSongScreen, toggleFromTraditionalPlayer ->
                     homeViewModel.onUiEvents(
                         uiEvents =  UIEvents.SelectedSongChange(index),
                         isClickSong = isClickSong,
                         traditionalPlayerToggle = traditionalPlayerToggle,
+                        getBackFromSongScreen = getBackFromSongScreen,
+                        toggleFromTraditionalPlayer = toggleFromTraditionalPlayer
                     )
                     startService()
                 },
@@ -62,6 +64,11 @@ fun SetupNavGraph(
                     homeViewModel.onTraditionalPlayerToggle(toggleState)
                 },
                 navController = navController,
+                navBackStackEntry = entry,
+//                shouldHandleBackPressed = homeViewModel.shouldHandleBackPressed,
+//                setShouldHandleBackPressed = {
+//                    homeViewModel.setShouldHandleBackPressed(it)
+//                }
             )
         }
         composable(route = Screen.PlayingSong.route){
@@ -88,6 +95,10 @@ fun SetupNavGraph(
                 },
                 navController = navController,
                 songDuration = songDuration,
+//                shouldHandleBackPressed = homeViewModel.shouldHandleBackPressed,
+//                setShouldHandleBackPressed = {
+//                    homeViewModel.setShouldHandleBackPressed(it)
+//                }
             )
         }
     }
