@@ -105,11 +105,12 @@ fun SongScreen(
 
             Spacer(modifier = Modifier.size(4.dp))
 
-            // song image, TODO: animation
+            // song image
             SongImageOnPlayingSongScreen(
                 onLoadSongImage = { context ->
                     onLoadSongImage(context, currPlayingSong)
                 },
+                isAudioPlaying = isAudioPlaying,
                 modifier = Modifier.weight(5f),
             )
 

@@ -81,7 +81,7 @@ fun HomeScreenTopBar(
                     onClick = {
                         expanded = false
                     },
-                    enabled = false,
+                    enabled = true,
                     leadingIcon = {
                         Icon(
                           imageVector = Icons.Default.SmartDisplay,

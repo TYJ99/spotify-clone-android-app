@@ -281,6 +281,7 @@ class HomeViewModel @Inject constructor(
                 try {
                     GlideApp.with(context)
                         .asBitmap()
+                        .apply(requestOptions)
                         .load(song.imageUrl)
                         .into(object : CustomTarget<Bitmap>() {
                             override fun onResourceReady(
