@@ -29,6 +29,7 @@ class SpotifyMusicServiceHandler @Inject constructor(
         exoPlayer.addListener(this)
     }
 
+
     fun addMediaItem(mediaItem: MediaItem) {
         exoPlayer.setMediaItem(mediaItem)
         exoPlayer.prepare()
