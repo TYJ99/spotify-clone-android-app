@@ -2,6 +2,7 @@ package com.tyj.spotifycloneandroidapp.presentation.screens.home.components
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,14 +17,19 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tyj.spotifycloneandroidapp.domain.model.Song
+import com.tyj.spotifycloneandroidapp.presentation.common.MusicBarAnimation
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.floor
 
@@ -31,10 +37,15 @@ import kotlin.math.floor
 fun AudioItem(
     song: Song,
     onItemClick: () -> Unit,
-    onLoadSongImage: (Context, Song) -> StateFlow<Bitmap?>
+    onLoadSongImage: (Context, Song) -> StateFlow<Bitmap?>,
+    currPlayingSong: Song,
+    isAudioPlaying: Boolean,
 ) {
 
     val songImage by onLoadSongImage(LocalContext.current, song).collectAsStateWithLifecycle()
+    var cardHeight by remember {
+        mutableStateOf(0)
+    }
 
     Card(
         modifier = Modifier
@@ -42,9 +53,11 @@ fun AudioItem(
             .padding(12.dp)
             .clickable {
                 onItemClick()
+            }.onSizeChanged {
+                Log.i("myDebugMusicBarAnimation", "Card size changed, ${it.height}")
+                cardHeight = it.height
             },
     ) {
-
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -86,16 +99,35 @@ fun AudioItem(
                 )
 
             }
-            /*
-            // TODO: calculate song duration
-            Text(
-                text = "TODO"
-                //text = timeStampToDuration(song.duration.toLong())
-            )
-
-             */
             Spacer(modifier = Modifier.size(8.dp))
         }
+
+        // add MusicBarAnimation
+        if(song == currPlayingSong) {
+            Log.i("myDebugMusicBarAnimation", "song: $song")
+            Log.i("myDebugMusicBarAnimation", "currPlayingSong: $currPlayingSong")
+            MusicBarAnimation(
+                isAudioPlaying = isAudioPlaying,
+                height = cardHeight,
+            )
+        }
+
+        /*
+        Box(
+            Modifier
+                .align(Alignment.CenterHorizontally)
+                .fillMaxSize(),
+            //contentAlignment = Alignment.Center
+        ) {
+
+
+
+
+        }
+
+         */
+
+
     }
 }
 

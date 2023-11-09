@@ -193,7 +193,9 @@ fun HomeScreen(
                     onItemClick = {
                         onItemClickOrSwipe(index, true, toggleState, false, false)
                     },
-                    onLoadSongImage = onLoadSongImage
+                    onLoadSongImage = onLoadSongImage,
+                    currPlayingSong = currPlayingSong,
+                    isAudioPlaying = isAudioPlaying,
                 )
 
             }

@@ -74,9 +74,9 @@ fun SongPlayerOnPlayingSongScreen(
                 onRewind = onRewind,
                 onFastForward = onFastForward,
                 modifier = Modifier
-                    .fillMaxWidth()
+//                    .fillMaxWidth()
                     .padding(4.dp)
-                    .weight(3f),
+                    .weight(3f)
             )
         }
 
