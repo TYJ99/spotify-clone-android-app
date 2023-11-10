@@ -39,6 +39,7 @@ fun SetupNavGraph(
                 songListState = songListState,
                 onStart = {
                     homeViewModel.onUiEvents(UIEvents.PlayPause)
+                    startService()
                 },
                 onItemClickOrSwipe = { index, isClickSong, traditionalPlayerToggle, getBackFromSongScreen, toggleFromTraditionalPlayer ->
                     homeViewModel.onUiEvents(
@@ -77,7 +78,10 @@ fun SetupNavGraph(
                 onProgress = { homeViewModel.onUiEvents(UIEvents.SeekTo(it)) },
                 currPlayingSong = currentSelectedSong,
                 isAudioPlaying = homeViewModel.isPlaying,
-                onStart = { homeViewModel.onUiEvents(UIEvents.PlayPause) },
+                onStart = {
+                    homeViewModel.onUiEvents(UIEvents.PlayPause)
+                    startService()
+                },
                 onNext = {
                     homeViewModel.onUiEvents(UIEvents.SeekToNext)
                 },

@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -53,14 +54,26 @@ fun SongPlayerOnPlayingSongScreen(
                 )
 
                 //Spacer(modifier = Modifier.size(4.dp))
-
-                Text(
-                    text = timeStampToDuration(songDuration),
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(paddingValues),
-                    textAlign = TextAlign.End,
-                )
+                        .padding(paddingValues)
+                ) {
+                    // (currentProgress.toFloat() / duration.toFloat()) * 100f
+                    val currentTime = ((progress / 100f) * songDuration).toLong()
+                    Text(
+                        text = timeStampToDuration(currentTime),
+                        textAlign = TextAlign.Start,
+                    )
+
+                    Text(
+                        text = timeStampToDuration(songDuration),
+                        textAlign = TextAlign.End,
+                    )
+
+                }
             }
 
 
@@ -74,9 +87,9 @@ fun SongPlayerOnPlayingSongScreen(
                 onRewind = onRewind,
                 onFastForward = onFastForward,
                 modifier = Modifier
-                    .fillMaxWidth()
+//                    .fillMaxWidth()
                     .padding(4.dp)
-                    .weight(3f),
+                    .weight(3f)
             )
         }
 

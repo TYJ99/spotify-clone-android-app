@@ -34,14 +34,16 @@ fun ArtistInfoPager(
 ) {
     val pagerState = rememberPagerState()
     val scope = rememberCoroutineScope()
-    var currPlayingSongPage by remember { mutableStateOf(0) }
+    var currPlayingSongPage by remember { mutableStateOf(-1) }
+
+    Log.i("myDebugPager", "In pager, currPlayingSongPage: $currPlayingSongPage")
 
     LaunchedEffect(currPlayingSong) {
         currPlayingSongPage = songList.indexOfFirst { song->
             song.mediaId == currPlayingSong.mediaId
         }
         //Log.i("myDebugPager", "In pager, songListItem: ${songList[currPlayingSongPage]}")
-        //Log.i("myDebugPager", "In pager, currPlayingSongPage: $currPlayingSongPage")
+        Log.i("myDebugPager", "LaunchedEffect(currPlayingSong), currPlayingSongPage: $currPlayingSongPage")
     }
 
     HorizontalPager(
@@ -84,6 +86,11 @@ fun ArtistInfoPager(
 
                 if(currPlayingSongPage != -1) {
                     onPagerSwipe(page)
+                }
+                else {
+                    currPlayingSongPage = page
+                    Log.i("myDebugPager", "In currPlayingSongPage == -1, currPlayingSongPage: $currPlayingSongPage")
+
                 }
 
             }
