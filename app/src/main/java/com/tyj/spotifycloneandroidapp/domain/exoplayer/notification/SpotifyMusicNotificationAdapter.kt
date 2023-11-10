@@ -8,9 +8,11 @@ import androidx.media3.common.Player
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.ui.PlayerNotificationManager
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.bumptech.glide.request.RequestOptions
 import com.bumptech.glide.request.target.CustomTarget
 import com.bumptech.glide.request.transition.Transition
 import com.tyj.spotifycloneandroidapp.GlideApp
+import com.tyj.spotifycloneandroidapp.R
 
 
 @UnstableApi
@@ -26,12 +28,17 @@ class SpotifyMusicNotificationAdapter(
     override fun getCurrentContentText(player: Player): CharSequence =
         player.mediaMetadata.subtitle ?: "Unknown"
 
+    private val requestOptions = RequestOptions()
+        .placeholder(R.drawable.ic_music)
+        .error(R.drawable.ic_music)
+
     override fun getCurrentLargeIcon(
         player: Player,
         callback: PlayerNotificationManager.BitmapCallback,
     ): Bitmap? {
         GlideApp.with(context)
             .asBitmap()
+            .apply(requestOptions)
             .load(player.mediaMetadata.artworkUri)
             .diskCacheStrategy(DiskCacheStrategy.ALL)
             .into(object : CustomTarget<Bitmap>() {
