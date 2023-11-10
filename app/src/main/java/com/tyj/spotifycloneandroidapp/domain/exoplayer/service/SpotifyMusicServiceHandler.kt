@@ -68,6 +68,7 @@ class SpotifyMusicServiceHandler @Inject constructor(
                 Log.i("myDebugPager", "selectedSongIndex: $selectedSongIndex")
                 Log.i("myDebugPager", "isClickSong: $isClickSong")
                 Log.i("myDebugPager", "traditionalPlayerToggle: $traditionalPlayerToggle")
+                Log.i("myDebugPager", "getBackFromSongScreen: $getBackFromSongScreen")
 
                 if((getBackFromSongScreen && !traditionalPlayerToggle) || toggleFromTraditionalPlayer) {
                     return
@@ -116,6 +117,38 @@ class SpotifyMusicServiceHandler @Inject constructor(
         }
     }
 
+    /*
+    override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
+        if(reason == Player.PLAY_WHEN_READY_CHANGE_REASON_END_OF_MEDIA_ITEM) {
+            Log.i("myDebugSongEnd", "song ended. currentMediaItemIndex: ${exoPlayer.currentMediaItemIndex + 1}")
+            exoPlayer.seekToDefaultPosition(exoPlayer.currentMediaItemIndex + 1)
+            //exoPlayer.playWhenReady = true
+        }
+        super.onPlayWhenReadyChanged(playWhenReady, reason)
+    }
+
+     */
+
+
+    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+        _songState.value = SongState.Ready(exoPlayer.duration)
+        _songState.value = SongState.CurrentPlaying(exoPlayer.currentMediaItemIndex)
+//        Log.i("myDebugSongEnd", "song ended. before is playing? ${exoPlayer.isPlaying}")
+//        exoPlayer.pause()
+//        Log.i("myDebugSongEnd", "song ended. after is playing? ${exoPlayer.isPlaying}")
+//        if(reason == Player.MEDIA_ITEM_TRANSITION_REASON_AUTO) {
+//            exoPlayer.seekToDefaultPosition(exoPlayer.currentMediaItemIndex)
+//            _songState.value = SongState.Playing(
+//                isPlaying = true
+//            )
+//            exoPlayer.playWhenReady = true
+//        }
+        super.onMediaItemTransition(mediaItem, reason)
+    }
+
+
+
+
     override fun onPlaybackStateChanged(playbackState: Int) {
         when (playbackState) {
             ExoPlayer.STATE_BUFFERING -> _songState.value =
@@ -123,7 +156,6 @@ class SpotifyMusicServiceHandler @Inject constructor(
 
             ExoPlayer.STATE_READY -> _songState.value =
                 SongState.Ready(exoPlayer.duration)
-
 
         }
     }
@@ -141,6 +173,7 @@ class SpotifyMusicServiceHandler @Inject constructor(
             stopProgressUpdate()
         }
     }
+
 
     private suspend fun playOrPause() {
         if (exoPlayer.isPlaying) {

@@ -9,11 +9,9 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
-import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.tyj.spotifycloneandroidapp.GlideApp
-import com.tyj.spotifycloneandroidapp.GlideAppModule
 import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicService
 import dagger.Module
@@ -60,6 +58,7 @@ object AppModule {
         .setTrackSelector(DefaultTrackSelector(context))
         .setSeekForwardIncrementMs(5000L)
         .setSeekBackIncrementMs(5000L)
+        //.setPauseAtEndOfMediaItems(true)
         .build()
 
     @Singleton

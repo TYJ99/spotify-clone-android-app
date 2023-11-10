@@ -53,7 +53,10 @@ fun SongScreen(
                 set("enabled", false)
                 set("getBackFromSongScreen", true)
             }
+        Log.i("myDebugPager", "in Song Screen, set getBackFromSongScreen: ${navController.previousBackStackEntry
+            ?.savedStateHandle?.get<Boolean>("getBackFromSongScreen")}")
         navController.popBackStack()
+
     }
 
     if(Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {
