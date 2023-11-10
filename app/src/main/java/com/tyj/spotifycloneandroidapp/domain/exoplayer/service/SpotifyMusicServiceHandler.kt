@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SpotifyMusicServiceHandler @Inject constructor(
-    private val mediaSession: MediaSession
+    private val mediaSession: MediaSession,
 ) : Player.Listener {
     private val _songState: MutableStateFlow<SongState> = MutableStateFlow(SongState.Initial)
     val songState: StateFlow<SongState> = _songState.asStateFlow()
@@ -123,6 +123,8 @@ class SpotifyMusicServiceHandler @Inject constructor(
 
             ExoPlayer.STATE_READY -> _songState.value =
                 SongState.Ready(exoPlayer.duration)
+
+
         }
     }
 
