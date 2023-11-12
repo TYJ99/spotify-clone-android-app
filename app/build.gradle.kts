@@ -206,8 +206,11 @@ dependencies {
     // media: MediaBrowserServiceCompat and MediaBrowserCompat
     implementation("androidx.media:media:1.6.0")
 
-    // MediaSessionConnector
+    // MediaSession
     implementation("androidx.media3:media3-session:1.1.1")
+
+    // splash screen
+    implementation("androidx.core:core-splashscreen:1.0.1")
 
     /*
     // ExoPlayer

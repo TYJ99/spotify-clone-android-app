@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="Theme.App.Starting" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">
+            @color/splashScreenBackground
+        </item>
+        <item name="windowSplashScreenAnimatedIcon">
+            @drawable/avd_splash_screen
+        </item>
+        <item name="windowSplashScreenAnimationDuration">
+            @integer/splashScreenAnimationDuration
+        </item>
+        <item name="postSplashScreenTheme">
+            @style/Theme.SpotifyCloneAndroidApp
+        </item>
+        <!--Android 12 specific styles (put this in values-v31) -->
+<!--        <item name="android:windowSplashScreenBrandingImage">-->
+<!--            @drawable/ic_brand_icon-->
+<!--        </item>-->
+        <!--Android 12 specific styles (put this in values-v31) -->
+    </style>
+</resources>
