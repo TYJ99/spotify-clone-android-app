@@ -26,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.unit.dp
-import com.tyj.spotifycloneandroidapp.presentation.common.MusicBarAnimation
+import com.tyj.spotifycloneandroidapp.presentation.common.components.MusicBarAnimation
 import com.tyj.spotifycloneandroidapp.presentation.screens.home.components.PlayerIconItem
 
 @Composable

@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.common
+package com.tyj.spotifycloneandroidapp.presentation.common.components
 
 import android.util.Log
 import androidx.activity.OnBackPressedCallback

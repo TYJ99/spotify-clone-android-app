@@ -11,6 +11,7 @@ import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
 import androidx.media3.session.MediaSession
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tyj.spotifycloneandroidapp.GlideApp
 import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicService
@@ -85,5 +86,6 @@ object AppModule {
     @Provides
     @Singleton
     fun provideSpotifyMusicService() = SpotifyMusicService()
+
 
 }

@@ -1,5 +1,6 @@
 package com.tyj.spotifycloneandroidapp.data.remote
 
+import com.tyj.spotifycloneandroidapp.domain.model.Album
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 /*
     Todo: Try to use local database for caching songs in local package
@@ -8,4 +9,5 @@ import com.tyj.spotifycloneandroidapp.domain.model.Song
  */
 interface MusicDatabase {
     suspend fun getAllSongs(): List<Song>
+    suspend fun getAllAlbums(): List<Album>
 }

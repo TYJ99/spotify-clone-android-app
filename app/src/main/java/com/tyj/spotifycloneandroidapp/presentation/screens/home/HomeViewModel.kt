@@ -22,6 +22,7 @@ import com.tyj.spotifycloneandroidapp.R
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.PlayerEvent
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SongState
 import com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler
+import com.tyj.spotifycloneandroidapp.domain.model.Album
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -60,6 +61,9 @@ class HomeViewModel @Inject constructor(
 
     private val _traditionalPlayerToggle: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val traditionalPlayerToggle: StateFlow<Boolean> = _traditionalPlayerToggle.asStateFlow()
+
+    private val _albumList: MutableStateFlow<List<Album>> = MutableStateFlow(listOf<Album>())
+    val albumList: StateFlow<List<Album>> = _albumList.asStateFlow()
 
 
     var shouldHandleBackPressed = true
@@ -100,7 +104,7 @@ class HomeViewModel @Inject constructor(
         Log.i("myDebug", "before loadAudioData: $songList")
         Log.i("myDebug", "loadAudioData")
         loadAudioData()
-
+        loadAlbumsData()
     }
 
     init {
@@ -139,6 +143,16 @@ class HomeViewModel @Inject constructor(
             Log.i("myDebug", "firebase data: $audio")
             _songList.value = audio
             Log.i("myDebug", "after loadAudioData: ${_songList.value}")
+            setMediaItems()
+        }
+    }
+
+    private fun loadAlbumsData() {
+        viewModelScope.launch {
+            val albums = repository.fetchAlbumsData()
+            Log.i("myDebugFetchAlbums", "firebase data: $albums")
+            _albumList.value = albums
+            Log.i("myDebugFetchAlbums", "after loadAudioData: ${_albumList.value}")
             setMediaItems()
         }
     }

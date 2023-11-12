@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.common
+package com.tyj.spotifycloneandroidapp.presentation.common.components
 
 import android.os.Build
 import android.util.Log

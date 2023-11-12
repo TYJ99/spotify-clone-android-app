@@ -20,7 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.tyj.spotifycloneandroidapp.common.BackInvokeHandler
+import com.tyj.spotifycloneandroidapp.presentation.common.components.BackInvokeHandler
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.screens.song.components.SongImageOnPlayingSongScreen
 import com.tyj.spotifycloneandroidapp.presentation.screens.song.components.SongInfo

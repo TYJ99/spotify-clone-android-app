@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.common
+package com.tyj.spotifycloneandroidapp.presentation.common.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack

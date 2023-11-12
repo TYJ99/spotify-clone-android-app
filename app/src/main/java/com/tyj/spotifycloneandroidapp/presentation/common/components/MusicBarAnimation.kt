@@ -1,4 +1,4 @@
-package com.tyj.spotifycloneandroidapp.presentation.common
+package com.tyj.spotifycloneandroidapp.presentation.common.components
 
 import android.util.Log
 import androidx.compose.animation.core.RepeatMode

@@ -22,7 +22,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.tyj.spotifycloneandroidapp.common.BackInvokeHandler
+import com.tyj.spotifycloneandroidapp.presentation.common.components.BackInvokeHandler
 import com.tyj.spotifycloneandroidapp.domain.model.Song
 import com.tyj.spotifycloneandroidapp.presentation.MainActivity
 import com.tyj.spotifycloneandroidapp.presentation.navigation.Screen

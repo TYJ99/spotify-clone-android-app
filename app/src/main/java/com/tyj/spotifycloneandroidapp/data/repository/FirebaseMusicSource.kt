@@ -21,6 +21,7 @@ import com.tyj.spotifycloneandroidapp.data.repository.State.STATE_CREATED
 import com.tyj.spotifycloneandroidapp.data.repository.State.STATE_ERROR
 import com.tyj.spotifycloneandroidapp.data.repository.State.STATE_INITIALIZED
 import com.tyj.spotifycloneandroidapp.data.repository.State.STATE_INITIALIZING
+import com.tyj.spotifycloneandroidapp.domain.model.Album
 import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -51,6 +52,10 @@ class FirebaseMusicSource @Inject constructor(
         }
         state = STATE_INITIALIZED
         allSongs
+    }
+
+    override suspend fun fetchAlbumsData(): List<Album> {
+        return emptyList()
     }
 
     /*

@@ -29,7 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.tyj.spotifycloneandroidapp.domain.model.Song
-import com.tyj.spotifycloneandroidapp.presentation.common.MusicBarAnimation
+import com.tyj.spotifycloneandroidapp.presentation.common.components.MusicBarAnimation
 import kotlinx.coroutines.flow.StateFlow
 import kotlin.math.floor
 
