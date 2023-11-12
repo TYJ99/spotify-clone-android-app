@@ -79,23 +79,23 @@ fun HomeScreen(
         }
     }
 
-    val enabled = navBackStackEntry.savedStateHandle.get<Boolean>("enabled")
-    val shouldHandleBackPressed = enabled ?: true
+    val shouldHandleBackPressed = navBackStackEntry.savedStateHandle.get<Boolean>("enabled") ?: true
+    Log.i("myDebugPressBackButton", "In HomeScreen, before, shouldHandleBackPressed = $shouldHandleBackPressed")
 
-    val getBackFromSongScreen = navBackStackEntry.savedStateHandle.get<Boolean>("getBackFromSongScreen")
-    val backFromSongScreen = getBackFromSongScreen ?: false
-
-    val getPagerPlayer = navBackStackEntry.savedStateHandle.get<Boolean>("pagerPlayer")
-    val pagerPlayer = getPagerPlayer ?: true
+    val pagerPlayer = navBackStackEntry.savedStateHandle.get<Boolean>("pagerPlayer") ?: true
 
     //Log.i("myDebugPressBackButton", "On Home Screen")
     //Log.i("myDebugPressBackButton", "current, shouldHandleBackPressed = $shouldHandleBackPressed")
 
 
-    var onBackPressed = { activity.moveTaskToBack(true) }
-    if(!shouldHandleBackPressed) onBackPressed = { true }
-
-
+    var onBackPressed = {
+        Log.i("myDebugPressBackButton", "onBackPressed, activity.moveTaskToBack(true)")
+        activity.moveTaskToBack(true)
+    }
+    if(!shouldHandleBackPressed) onBackPressed = {
+        Log.i("myDebugPressBackButton", "onBackPressed: false")
+        false
+    }
 
     //val onBackPressed = { activity.onBackPressedDispatcher.onBackPressed() }
 
@@ -115,6 +115,7 @@ fun HomeScreen(
         }
     }
     else {
+        //Log.i("myDebugPressBackButton", "BackHandler, shouldHandleBackPressed = $shouldHandleBackPressed")
         BackHandler(enabled = true) {
             Log.i("myDebugPressBackButton", "On Home Screen")
             Log.i("myDebugPressBackButton", "handle back pressed")
@@ -156,6 +157,9 @@ fun HomeScreen(
                 toggleFromTraditionalPlayer = true
             }
 
+            var backFromSongScreen = navBackStackEntry.savedStateHandle.get<Boolean>("getBackFromSongScreen") ?: false
+            Log.i("myDebugPager", "In HomeScreen, before, backFromSongScreen: $backFromSongScreen")
+
             BottomBarPlayer(
                 progress = progress,
                 onProgress = onProgress,
@@ -168,6 +172,8 @@ fun HomeScreen(
                 traditionalPlayerToggle = toggleState,
                 navController = navController,
                 onPagerSwipe = { page ->
+                    backFromSongScreen = navBackStackEntry.savedStateHandle.get<Boolean>("getBackFromSongScreen") ?: false
+                    Log.i("myDebugPager", "In BottomBarPlayer, backFromSongScreen: $backFromSongScreen")
                     onItemClickOrSwipe(
                         page,
                         false,
@@ -175,9 +181,15 @@ fun HomeScreen(
                         backFromSongScreen,
                         toggleFromTraditionalPlayer,
                     )
+                    if(backFromSongScreen) {
+                        Log.i("myDebugPager", "onPagerSwipe, before, backFromSongScreen: ${navBackStackEntry.savedStateHandle.get<Boolean>("getBackFromSongScreen")}")
+
+                        navBackStackEntry.savedStateHandle["getBackFromSongScreen"] = false
+                        Log.i("myDebugPager", "onPagerSwipe, after, backFromSongScreen: ${navBackStackEntry.savedStateHandle.get<Boolean>("getBackFromSongScreen")}")
+
+                    }
                 },
             )
-            if(backFromSongScreen) navBackStackEntry.savedStateHandle.set<Boolean>("getBackFromSongScreen", false)
             navBackStackEntry.savedStateHandle["pagerPlayer"] = !toggleState
         }
     ) {
@@ -200,98 +212,6 @@ fun HomeScreen(
 
             }
         }
-
-        /*
-        LazyColumn(
-            contentPadding = it
-        ) {
-            Log.i("myDebug", "LazyColumn in SongScreen recomposed, isSongListChanged : $isSongListChanged, songList : $songList")
-
-            if(isSongListChanged) {
-                itemsIndexed(songList) { index, song ->
-                    val songImage by onLoadSongImage(LocalContext.current, song).collectAsStateWithLifecycle()
-                    songImage?.let {
-                        ++songImageCount
-                    }
-                    Log.i("myDebug", "songImage = $songImage")
-                    songItemListState = songItemListState.toMutableList().apply{
-                        songImage?.let {
-                            Log.i("myDebug", "index = $index")
-                            if(index == this.size) {
-                                Log.i("myDebug", "add songItem to songItemListState")
-                                add(index, SongItem(song, songImage))
-                            }else {
-                                Log.i("myDebug", "set songItem to songItemListState")
-                                set(index, SongItem(song, songImage))
-                            }
-                        }
-                    }
-//                    Log.i("myDebug", "in isSongListChanged = true, songItemListState.size ${songItemListState.size}, songList.size: ${songList.size}")
-//                    Log.i("myDebug", "isSongListChanged = $isSongListChanged, songItemListState = $songItemListState")
-
-                }
-
-            } else {
-                Log.i("myDebug", "in isSongListChanged = false, songItemList = $songItemListState")
-                itemsIndexed(songItemListState){ index, songItem ->
-                    AudioItem(
-                        song = songItem.song,
-                        onItemClick = {
-                            onItemClick(index)
-                        },
-                        songImage = songItem.songImage
-                    )
-                }
-            }
-
-            if(songList.size == songItemListState.size &&
-                songImageCount >= songList.size &&
-                songImageCount <= songList.size * 2) {
-                Log.i("myDebug", "songList.size == songItemListState.size")
-                isSongListChanged = false
-            }
-
-        }
-
-         */
-        /*
-        LazyColumn(
-            contentPadding = it
-        ) {
-            Log.i("myDebug", "LazyColumn in SongScreen recomposed, songList : ${songList.size}: $songList")
-
-            itemsIndexed(songList) { index, song ->
-                val songImage by onLoadSongImage(LocalContext.current, song).collectAsStateWithLifecycle()
-                Log.i("myDebug", "songImage = $songImage")
-                val songItem = songItemMapState[index]
-                if( songItem != null &&
-                    songImage == songItem.currSongImage &&
-                    songItem.prevSongImage == songItem.currSongImage) {
-
-                    Log.i("myDebug", "AudioItem: prev/curr: ${songItem.prevSongImage}, ${songItem.currSongImage}")
-                    AudioItem(
-                        song = songItem.song,
-                        onItemClick = {
-                            onItemClick(index)
-                        },
-                        songImage = songItem.currSongImage
-                    )
-                }else {
-                    songItemMapState = songItemMapState.toMutableMap().apply {
-                        songImage?.let {
-                            val newSongItem = if(songItem != null) SongItem(song, songItem.currSongImage, songImage) else SongItem(song, null, songImage)
-                            put(index, newSongItem)
-                            Log.i("myDebug", "no AudioItem: prev/curr: ${newSongItem.prevSongImage}, ${newSongItem.currSongImage}")
-                        }
-                    }
-                }
-//                    Log.i("myDebug", "in isSongListChanged = true, songItemListState.size ${songItemListState.size}, songList.size: ${songList.size}")
-//                    Log.i("myDebug", "isSongListChanged = $isSongListChanged, songItemListState = $songItemListState")
-
-            }
-        }
-
-         */
 
     }
 }

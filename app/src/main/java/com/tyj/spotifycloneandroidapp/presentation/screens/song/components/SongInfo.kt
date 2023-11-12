@@ -15,7 +15,7 @@ fun SongInfo(
     modifier: Modifier = Modifier
 ) {
     var songInfo = "No Song is Playing"
-    if(song.mediaId != "") songInfo = "${song.title} by ${song.subtitle}"
+    if(song.mediaId != "") songInfo = "${song.title} - ${song.subtitle}"
     Text(
         text = songInfo,
         modifier = modifier.basicMarquee(),

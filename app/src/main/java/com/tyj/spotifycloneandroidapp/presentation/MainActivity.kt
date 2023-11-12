@@ -14,13 +14,12 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.media3.session.MediaSession
 import androidx.navigation.compose.rememberNavController
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
@@ -55,6 +54,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalPermissionsApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        installSplashScreen()
         Log.i("myDebug", "initialize viewModel")
         setContent {
             SpotifyCloneAndroidAppTheme {
@@ -76,9 +76,9 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                val songListState = viewModel.songList.collectAsStateWithLifecycle()
-                val currentSelectedSong by viewModel.currentSelectedSong.collectAsStateWithLifecycle()
-                val toggleState by viewModel.traditionalPlayerToggle.collectAsStateWithLifecycle()
+//                val songListState = viewModel.songList.collectAsStateWithLifecycle()
+//                val currentSelectedSong by viewModel.currentSelectedSong.collectAsStateWithLifecycle()
+//                val toggleState by viewModel.traditionalPlayerToggle.collectAsStateWithLifecycle()
                 val navController = rememberNavController()
 
 

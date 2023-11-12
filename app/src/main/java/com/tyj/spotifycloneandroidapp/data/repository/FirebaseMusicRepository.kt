@@ -2,6 +2,7 @@ package com.tyj.spotifycloneandroidapp.data.repository
 
 import com.tyj.spotifycloneandroidapp.data.remote.MusicDatabase
 import com.tyj.spotifycloneandroidapp.di.BindFakeMusicDatabase
+import com.tyj.spotifycloneandroidapp.di.BindSpotifyMusicDatabase
 import com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

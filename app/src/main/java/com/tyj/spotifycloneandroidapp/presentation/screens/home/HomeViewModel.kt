@@ -107,6 +107,8 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             musicServiceHandler.songState.collectLatest { songState ->
                 //Log.i("myDebugPager","In SongViewModel Collect, songState: $songState")
+                //Log.i("myDebugSongEnd", "songState: $songState")
+
                 when (songState) {
                     SongState.Initial -> {
                         _uiState.value = UIState.Initial
