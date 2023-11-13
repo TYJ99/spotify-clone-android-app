@@ -11,7 +11,7 @@ Spotify Clone music player Android App (Kotlin, Firestore, MVVM, Hilt, Media3, P
 - Reduced latency in asynchronous operations by utilizing Coroutines, enhancing user experience responsiveness. 
 - Reduced code complexity by 30% via efficient dependency injection with Hilt, enhancing code maintainability and scalability.
 
-Here is the APK
+Here is the [APK](./app/release/app-release.apk)  
 
 It supports several features:  
 1. Animated Splash Screen:
