@@ -9,7 +9,7 @@ import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class FirebaseMusicRepository @Inject constructor(
-    @BindFakeMusicDatabase private val musicDatabase: MusicDatabase
+    @BindSpotifyMusicDatabase private val musicDatabase: MusicDatabase
 ): MusicRepository {
     override suspend fun fetchMediaData() = withContext(Dispatchers.IO) {
         musicDatabase.getAllSongs()

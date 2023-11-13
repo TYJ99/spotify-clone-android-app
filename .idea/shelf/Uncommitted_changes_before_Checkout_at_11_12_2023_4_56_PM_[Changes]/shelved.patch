@@ -1,0 +1,266 @@
+Index: app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeScreen.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tyj.spotifycloneandroidapp.presentation.screens.home\r\n\r\nimport android.content.Context\r\nimport android.graphics.Bitmap\r\nimport android.os.Build\r\nimport android.util.Log\r\nimport androidx.activity.compose.BackHandler\r\nimport androidx.compose.foundation.lazy.LazyColumn\r\nimport androidx.compose.foundation.lazy.itemsIndexed\r\nimport androidx.compose.foundation.lazy.rememberLazyListState\r\nimport androidx.compose.material3.Scaffold\r\nimport androidx.compose.runtime.Composable\r\nimport androidx.compose.runtime.State\r\nimport androidx.compose.runtime.getValue\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.compose.runtime.remember\r\nimport androidx.compose.ui.platform.LocalContext\r\nimport androidx.compose.ui.platform.LocalLifecycleOwner\r\nimport androidx.compose.ui.tooling.preview.Preview\r\nimport androidx.navigation.NavBackStackEntry\r\nimport androidx.navigation.NavHostController\r\nimport androidx.navigation.compose.NavHost\r\nimport androidx.navigation.compose.composable\r\nimport androidx.navigation.compose.rememberNavController\r\nimport com.tyj.spotifycloneandroidapp.presentation.common.components.BackInvokeHandler\r\nimport com.tyj.spotifycloneandroidapp.domain.model.Song\r\nimport com.tyj.spotifycloneandroidapp.presentation.MainActivity\r\nimport com.tyj.spotifycloneandroidapp.presentation.navigation.Screen\r\nimport com.tyj.spotifycloneandroidapp.presentation.screens.home.components.AudioItem\r\nimport com.tyj.spotifycloneandroidapp.presentation.screens.home.components.BottomBarPlayer\r\nimport com.tyj.spotifycloneandroidapp.presentation.screens.home.components.HomeScreenTopBar\r\nimport com.tyj.spotifycloneandroidapp.presentation.ui.theme.SpotifyCloneAndroidAppTheme\r\nimport kotlinx.coroutines.flow.MutableStateFlow\r\nimport kotlinx.coroutines.flow.StateFlow\r\n\r\n\r\n@Composable\r\nfun HomeScreen(\r\n    progress: Float,\r\n    onProgress: (Float) -> Unit,\r\n    currPlayingSong: Song,\r\n    isAudioPlaying: Boolean,\r\n    songListState: State<List<Song>>,\r\n    onStart: () -> Unit,\r\n    onItemClickOrSwipe: (Int, Boolean, Boolean, Boolean, Boolean) -> Unit,\r\n    onNext: () -> Unit,\r\n    onPrevious: () -> Unit,\r\n    onLoadSongImage: (Context, Song) -> StateFlow<Bitmap?>,\r\n    toggleState: Boolean,\r\n    onToggle: (Boolean) -> Unit,\r\n    navController: NavHostController,\r\n    navBackStackEntry: NavBackStackEntry,\r\n//    shouldHandleBackPressed: Boolean,\r\n//    setShouldHandleBackPressed: (Boolean) -> Unit\r\n) {\r\n    val songList by songListState\r\n    val lazyColumnState = rememberLazyListState()\r\n    Log.i(\"myDebug\", \"in HomeScreen, songList $songList\")\r\n    Log.i(\"myDebug\", \"in HomeScreen, songListState ${songListState.value}\")\r\n    /*\r\n    LaunchedEffect(key1 = songList) {\r\n        Log.i(\"myDebug\", \"LaunchedEffect in SongScreen, songList Changed, songList ${songList.size}\")\r\n//        songItemListState = emptyList()\r\n//        songItemMapState = emptyMap()\r\n//        isSongListChanged = true\r\n    }\r\n\r\n     */\r\n\r\n    val activity = when(LocalLifecycleOwner.current) {\r\n        is MainActivity -> LocalLifecycleOwner.current as MainActivity\r\n        else -> {\r\n            val context = LocalContext.current\r\n            if (context is MainActivity) {\r\n                context\r\n            } else {\r\n                throw IllegalStateException(\"LocalLifecycleOwner is not MainActivity or Fragment\")\r\n            }\r\n        }\r\n    }\r\n\r\n    val shouldHandleBackPressed = navBackStackEntry.savedStateHandle.get<Boolean>(\"enabled\") ?: true\r\n    Log.i(\"myDebugPressBackButton\", \"In HomeScreen, before, shouldHandleBackPressed = $shouldHandleBackPressed\")\r\n\r\n    val pagerPlayer = navBackStackEntry.savedStateHandle.get<Boolean>(\"pagerPlayer\") ?: true\r\n\r\n    //Log.i(\"myDebugPressBackButton\", \"On Home Screen\")\r\n    //Log.i(\"myDebugPressBackButton\", \"current, shouldHandleBackPressed = $shouldHandleBackPressed\")\r\n\r\n\r\n    var onBackPressed = {\r\n        Log.i(\"myDebugPressBackButton\", \"onBackPressed, activity.moveTaskToBack(true)\")\r\n        activity.moveTaskToBack(true)\r\n    }\r\n    if(!shouldHandleBackPressed) onBackPressed = {\r\n        Log.i(\"myDebugPressBackButton\", \"onBackPressed: false\")\r\n        false\r\n    }\r\n\r\n    //val onBackPressed = { activity.onBackPressedDispatcher.onBackPressed() }\r\n\r\n    if(Build.VERSION.SDK_INT > Build.VERSION_CODES.TIRAMISU) {\r\n        BackInvokeHandler(\r\n            handleBackHandler = true,\r\n            onBackPressed = {\r\n                onBackPressed()\r\n            }\r\n        )\r\n        if(!shouldHandleBackPressed) {\r\n            Log.i(\"myDebugPressBackButton\", \"before, shouldHandleBackPressed = ${navBackStackEntry.savedStateHandle.get<Boolean>(\"enabled\")!!}\")\r\n\r\n            navBackStackEntry.savedStateHandle.set<Boolean>(\"enabled\", true)\r\n\r\n            Log.i(\"myDebugPressBackButton\", \"after, shouldHandleBackPressed = ${navBackStackEntry.savedStateHandle.get<Boolean>(\"enabled\")!!}\")\r\n        }\r\n    }\r\n    else {\r\n        //Log.i(\"myDebugPressBackButton\", \"BackHandler, shouldHandleBackPressed = $shouldHandleBackPressed\")\r\n        BackHandler(enabled = true) {\r\n            Log.i(\"myDebugPressBackButton\", \"On Home Screen\")\r\n            Log.i(\"myDebugPressBackButton\", \"handle back pressed\")\r\n\r\n            onBackPressed()\r\n        }\r\n\r\n        if(!shouldHandleBackPressed) {\r\n            Log.i(\"myDebugPressBackButton\", \"On Home Screen\")\r\n            Log.i(\"myDebugPressBackButton\", \"before, shouldHandleBackPressed = ${navBackStackEntry.savedStateHandle.get<Boolean>(\"enabled\")!!}\")\r\n\r\n            navBackStackEntry.savedStateHandle.set<Boolean>(\"enabled\", true)\r\n\r\n            Log.i(\"myDebugPressBackButton\", \"after, shouldHandleBackPressed = ${navBackStackEntry.savedStateHandle.get<Boolean>(\"enabled\")!!}\")\r\n        }\r\n\r\n    }\r\n\r\n\r\n\r\n\r\n//    BackPressHandler(\r\n//        onBackPressed = { onBackPressed() },\r\n//    )\r\n\r\n    Scaffold(\r\n        topBar = {\r\n            HomeScreenTopBar(\r\n                toggleState = toggleState,\r\n                onToggle = onToggle,\r\n                onBackPressed = {\r\n                    onBackPressed()\r\n                }\r\n            )\r\n        },\r\n        bottomBar = {\r\n            var toggleFromTraditionalPlayer = false\r\n            if(!pagerPlayer && !toggleState) {\r\n                toggleFromTraditionalPlayer = true\r\n            }\r\n\r\n            var backFromSongScreen = navBackStackEntry.savedStateHandle.get<Boolean>(\"getBackFromSongScreen\") ?: false\r\n            Log.i(\"myDebugPager\", \"In HomeScreen, before, backFromSongScreen: $backFromSongScreen\")\r\n\r\n            BottomBarPlayer(\r\n                progress = progress,\r\n                onProgress = onProgress,\r\n                isAudioPlaying = isAudioPlaying,\r\n                onStart = onStart,\r\n                onNext = onNext,\r\n                onPrevious = onPrevious,\r\n                currPlayingSong = currPlayingSong,\r\n                songList = songList,\r\n                traditionalPlayerToggle = toggleState,\r\n                navController = navController,\r\n                onPagerSwipe = { page ->\r\n                    backFromSongScreen = navBackStackEntry.savedStateHandle.get<Boolean>(\"getBackFromSongScreen\") ?: false\r\n                    Log.i(\"myDebugPager\", \"In BottomBarPlayer, backFromSongScreen: $backFromSongScreen\")\r\n                    onItemClickOrSwipe(\r\n                        page,\r\n                        false,\r\n                        toggleState,\r\n                        backFromSongScreen,\r\n                        toggleFromTraditionalPlayer,\r\n                    )\r\n                    if(backFromSongScreen) {\r\n                        Log.i(\"myDebugPager\", \"onPagerSwipe, before, backFromSongScreen: ${navBackStackEntry.savedStateHandle.get<Boolean>(\"getBackFromSongScreen\")}\")\r\n\r\n                        navBackStackEntry.savedStateHandle[\"getBackFromSongScreen\"] = false\r\n                        Log.i(\"myDebugPager\", \"onPagerSwipe, after, backFromSongScreen: ${navBackStackEntry.savedStateHandle.get<Boolean>(\"getBackFromSongScreen\")}\")\r\n\r\n                    }\r\n                },\r\n            )\r\n            navBackStackEntry.savedStateHandle[\"pagerPlayer\"] = !toggleState\r\n        }\r\n    ) {\r\n\r\n        LazyColumn(\r\n            contentPadding = it,\r\n            state = lazyColumnState\r\n        ) {\r\n            Log.i(\"myDebug\", \"recompose lazyColumn\")\r\n            itemsIndexed(songList) { index, song ->\r\n                AudioItem(\r\n                    song = song,\r\n                    onItemClick = {\r\n                        onItemClickOrSwipe(index, true, toggleState, false, false)\r\n                    },\r\n                    onLoadSongImage = onLoadSongImage,\r\n                    currPlayingSong = currPlayingSong,\r\n                    isAudioPlaying = isAudioPlaying,\r\n                )\r\n\r\n            }\r\n        }\r\n\r\n    }\r\n}\r\n\r\ndata class SongItem(\r\n    val song: Song,\r\n    val prevSongImage: Bitmap? = null,\r\n    val currSongImage: Bitmap? = null\r\n)\r\n\r\n/*\r\n@Composable\r\nfun LazyColumnComponent(\r\n    lazyColumnState: LazyListState,\r\n    contentPadding: PaddingValues,\r\n    songList: List<Song>,\r\n    onItemClick: (Int) -> Unit,\r\n    onLoadSongImage: (Context, Song) -> MutableStateFlow<Bitmap?>\r\n) {\r\n    Log.i(\"myDebug\", \"recompose lazyColumn\")\r\n    LazyColumn(\r\n        contentPadding = contentPadding,\r\n        state = lazyColumnState\r\n    ) {\r\n        Log.i(\"myDebug\", \"recompose lazyColumn\")\r\n        itemsIndexed(songList) { index, song ->\r\n            AudioItem(\r\n                song = song,\r\n                onItemClick = {\r\n                    onItemClick(index)\r\n                },\r\n                onLoadSongImage = onLoadSongImage\r\n            )\r\n        }\r\n    }\r\n}\r\n\r\n */\r\n\r\n@Preview(showSystemUi = true)\r\n@Composable\r\nfun SongScreenPrev() {\r\n    SpotifyCloneAndroidAppTheme {\r\n        var entry: NavBackStackEntry? = null\r\n        NavHost(\r\n            navController = rememberNavController(),\r\n            startDestination = Screen.Home.route,\r\n        ) {\r\n            composable(route = Screen.Home.route) {\r\n                entry = it\r\n            }\r\n        }\r\n\r\n        HomeScreen(\r\n            progress = 50f,\r\n            onProgress = {},\r\n            currPlayingSong = Song(\"1\", \"Title One\", \"Artist 1\", \"\", \"\"),\r\n            isAudioPlaying = true,\r\n            songListState = remember {\r\n                mutableStateOf(listOf(\r\n                Song(\"1\", \"Title One\", \"Artist 1\", \"\", \"\"),\r\n                Song(\"2\", \"Title Two\", \"Artist 2\", \"\", \"\"),\r\n            ))\r\n            },\r\n            onStart = {},\r\n            onItemClickOrSwipe = {_,_,_,_,_ -> Unit},\r\n            onNext = {},\r\n            onPrevious = {},\r\n            onLoadSongImage = { _, _ -> MutableStateFlow<Bitmap?>(null) },\r\n            toggleState = false,\r\n            onToggle = { _ -> Unit },\r\n            navController = rememberNavController(),\r\n            navBackStackEntry = entry!!,\r\n//            shouldHandleBackPressed = true,\r\n//            setShouldHandleBackPressed = {_ -> Unit},\r\n        )\r\n    }\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeScreen.kt b/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeScreen.kt
+--- a/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeScreen.kt	(revision d8bdb995ddb3840e1bbf114aa19c11c7c9c0435c)
++++ b/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeScreen.kt	(date 1699829337520)
+@@ -5,7 +5,11 @@
+ import android.os.Build
+ import android.util.Log
+ import androidx.activity.compose.BackHandler
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Spacer
+ import androidx.compose.foundation.lazy.LazyColumn
++import androidx.compose.foundation.lazy.LazyRow
++import androidx.compose.foundation.lazy.items
+ import androidx.compose.foundation.lazy.itemsIndexed
+ import androidx.compose.foundation.lazy.rememberLazyListState
+ import androidx.compose.material3.Scaffold
+@@ -14,6 +18,7 @@
+ import androidx.compose.runtime.getValue
+ import androidx.compose.runtime.mutableStateOf
+ import androidx.compose.runtime.remember
++import androidx.compose.ui.Modifier
+ import androidx.compose.ui.platform.LocalContext
+ import androidx.compose.ui.platform.LocalLifecycleOwner
+ import androidx.compose.ui.tooling.preview.Preview
+@@ -22,10 +27,12 @@
+ import androidx.navigation.compose.NavHost
+ import androidx.navigation.compose.composable
+ import androidx.navigation.compose.rememberNavController
++import com.tyj.spotifycloneandroidapp.domain.model.Album
+ import com.tyj.spotifycloneandroidapp.presentation.common.components.BackInvokeHandler
+ import com.tyj.spotifycloneandroidapp.domain.model.Song
+ import com.tyj.spotifycloneandroidapp.presentation.MainActivity
+ import com.tyj.spotifycloneandroidapp.presentation.navigation.Screen
++import com.tyj.spotifycloneandroidapp.presentation.screens.home.components.AlbumItem
+ import com.tyj.spotifycloneandroidapp.presentation.screens.home.components.AudioItem
+ import com.tyj.spotifycloneandroidapp.presentation.screens.home.components.BottomBarPlayer
+ import com.tyj.spotifycloneandroidapp.presentation.screens.home.components.HomeScreenTopBar
+@@ -50,6 +57,7 @@
+     onToggle: (Boolean) -> Unit,
+     navController: NavHostController,
+     navBackStackEntry: NavBackStackEntry,
++    albumList: List<Album>,
+ //    shouldHandleBackPressed: Boolean,
+ //    setShouldHandleBackPressed: (Boolean) -> Unit
+ ) {
+@@ -194,6 +202,28 @@
+         }
+     ) {
+ 
++        Column {
++            LazyRow(
++                modifier = Modifier.weight(3f),
++            ) {
++                items(
++                    items = albumList,
++                    key = { album -> "${album.artist}${album.title}" }
++                ) {
++                    AlbumItem(
++                        album = it,
++                        onItemClick = {  },
++                        onLoadAlbumImage = ,
++                        currPlayingSong = ,
++                        isAudioPlaying =
++                    )
++                }
++            }
++
++            Spacer(modifier = Modifier.weight(1f))
++
++        }
++
+         LazyColumn(
+             contentPadding = it,
+             state = lazyColumnState
+Index: app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeViewModel.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>package com.tyj.spotifycloneandroidapp.presentation.screens.home\r\n\r\nimport android.content.Context\r\nimport android.graphics.Bitmap\r\nimport android.graphics.drawable.Drawable\r\nimport android.util.Log\r\nimport androidx.compose.runtime.mutableStateOf\r\nimport androidx.core.net.toUri\r\nimport androidx.lifecycle.SavedStateHandle\r\nimport androidx.lifecycle.ViewModel\r\nimport androidx.lifecycle.viewModelScope\r\nimport androidx.lifecycle.viewmodel.compose.SavedStateHandleSaveableApi\r\nimport androidx.lifecycle.viewmodel.compose.saveable\r\nimport androidx.media3.common.MediaItem\r\nimport androidx.media3.common.MediaMetadata\r\nimport com.bumptech.glide.load.engine.GlideException\r\nimport com.bumptech.glide.request.RequestOptions\r\nimport com.bumptech.glide.request.target.CustomTarget\r\nimport com.bumptech.glide.request.transition.Transition\r\nimport com.tyj.spotifycloneandroidapp.GlideApp\r\nimport com.tyj.spotifycloneandroidapp.R\r\nimport com.tyj.spotifycloneandroidapp.domain.exoplayer.service.PlayerEvent\r\nimport com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SongState\r\nimport com.tyj.spotifycloneandroidapp.domain.exoplayer.service.SpotifyMusicServiceHandler\r\nimport com.tyj.spotifycloneandroidapp.domain.model.Album\r\nimport com.tyj.spotifycloneandroidapp.domain.model.Song\r\nimport com.tyj.spotifycloneandroidapp.domain.repository.MusicRepository\r\nimport dagger.hilt.android.lifecycle.HiltViewModel\r\nimport kotlinx.coroutines.flow.MutableStateFlow\r\nimport kotlinx.coroutines.flow.StateFlow\r\nimport kotlinx.coroutines.flow.asStateFlow\r\nimport kotlinx.coroutines.flow.collectLatest\r\nimport kotlinx.coroutines.launch\r\nimport java.util.concurrent.TimeUnit\r\nimport javax.inject.Inject\r\n\r\n\r\nprivate val dummySong = Song(\r\n    \"\", \"\", \"\", \"\", \"\"\r\n)\r\n\r\n@OptIn(SavedStateHandleSaveableApi::class)\r\n@HiltViewModel\r\nclass HomeViewModel @Inject constructor(\r\n    private val musicServiceHandler: SpotifyMusicServiceHandler,\r\n    private val repository: MusicRepository,\r\n    savedStateHandle: SavedStateHandle,\r\n) : ViewModel() {\r\n    var duration by savedStateHandle.saveable { mutableStateOf(0L) }\r\n    var progress by savedStateHandle.saveable { mutableStateOf(0f) }\r\n    var progressString by savedStateHandle.saveable { mutableStateOf(\"00:00\") }\r\n    var isPlaying by savedStateHandle.saveable { mutableStateOf(false) }\r\n//    var currentSelectedSong by savedStateHandle.saveable { mutableStateOf(dummySong) }\r\n//    var songList by savedStateHandle.saveable { mutableStateOf(listOf<Song>()) }\r\n\r\n    private val _currentSelectedSong: MutableStateFlow<Song> = MutableStateFlow(dummySong)\r\n    val currentSelectedSong: StateFlow<Song> = _currentSelectedSong.asStateFlow()\r\n\r\n    private val _songList: MutableStateFlow<List<Song>> = MutableStateFlow(listOf<Song>())\r\n    val songList: StateFlow<List<Song>> = _songList.asStateFlow()\r\n\r\n    private val _traditionalPlayerToggle: MutableStateFlow<Boolean> = MutableStateFlow(false)\r\n    val traditionalPlayerToggle: StateFlow<Boolean> = _traditionalPlayerToggle.asStateFlow()\r\n\r\n    private val _albumList: MutableStateFlow<List<Album>> = MutableStateFlow(listOf<Album>())\r\n    val albumList: StateFlow<List<Album>> = _albumList.asStateFlow()\r\n\r\n\r\n    var shouldHandleBackPressed = true\r\n        private set\r\n\r\n    /*\r\n    private val _songImage: MutableStateFlow<Bitmap?> = MutableStateFlow(null)\r\n    val songImage: StateFlow<Bitmap?> = _songImage.asStateFlow()\r\n\r\n     */\r\n\r\n    private val mediaIdBitmapItemMap: MutableMap<String, BitMapItem> = mutableMapOf()\r\n    var loadHolderBitmap: Bitmap? = null\r\n\r\n//    var duration by mutableStateOf (\r\n//        savedStateHandle.get<Long>(\"duration\") ?: 0L\r\n//    )\r\n//    var progress by mutableStateOf (\r\n//            savedStateHandle.get<Float>(\"progress\") ?: 0f\r\n//    )\r\n//    var progressString by mutableStateOf (\r\n//        savedStateHandle.get<String>(\"progress\") ?: \"00:00\"\r\n//    )\r\n//    var isPlaying by mutableStateOf (\r\n//        savedStateHandle.get<Boolean>(\"isPlaying\") ?: false\r\n//    )\r\n//    var currentSelectedSong by mutableStateOf (\r\n//        savedStateHandle.get<Song>(\"currentSelectedSong\") ?: dummySong\r\n//    )\r\n//    var songList by mutableStateOf (\r\n//        savedStateHandle.get<Song>(\"currentSelectedSong\") ?: dummySong\r\n//    )\r\n\r\n    private val _uiState: MutableStateFlow<UIState> = MutableStateFlow(UIState.Initial)\r\n    val uiState: StateFlow<UIState> = _uiState.asStateFlow()\r\n\r\n    init {\r\n        Log.i(\"myDebug\", \"before loadAudioData: $songList\")\r\n        Log.i(\"myDebug\", \"loadAudioData\")\r\n        loadAudioData()\r\n        loadAlbumsData()\r\n    }\r\n\r\n    init {\r\n        viewModelScope.launch {\r\n            musicServiceHandler.songState.collectLatest { songState ->\r\n                //Log.i(\"myDebugPager\",\"In SongViewModel Collect, songState: $songState\")\r\n                //Log.i(\"myDebugSongEnd\", \"songState: $songState\")\r\n\r\n                when (songState) {\r\n                    SongState.Initial -> {\r\n                        _uiState.value = UIState.Initial\r\n                    }\r\n                    is SongState.Buffering -> calculateProgressValue(songState.progress)\r\n                    is SongState.Playing -> isPlaying = songState.isPlaying\r\n                    is SongState.Progress -> calculateProgressValue(songState.progress)\r\n                    is SongState.CurrentPlaying -> {\r\n                        _currentSelectedSong.value = _songList.value[songState.mediaItemIndex]\r\n                        //Log.i(\"myDebugPager\", \"SongState.CurrentPlaying. _currentSelectedSong: ${_currentSelectedSong.value}\")\r\n                    }\r\n\r\n                    is SongState.Ready -> {\r\n                        duration = songState.duration\r\n                        _uiState.value = UIState.Ready\r\n                        // if(_songList.value.isNotEmpty()) _currentSelectedSong.value = _songList.value[0]\r\n                    }\r\n                }\r\n            }\r\n\r\n\r\n        }\r\n    }\r\n\r\n    private fun loadAudioData() {\r\n        viewModelScope.launch {\r\n            val audio = repository.fetchMediaData()\r\n            Log.i(\"myDebug\", \"firebase data: $audio\")\r\n            _songList.value = audio\r\n            Log.i(\"myDebug\", \"after loadAudioData: ${_songList.value}\")\r\n            setMediaItems()\r\n        }\r\n    }\r\n\r\n    private fun loadAlbumsData() {\r\n        viewModelScope.launch {\r\n            val albums = repository.fetchAlbumsData()\r\n            Log.i(\"myDebugFetchAlbums\", \"firebase data: $albums\")\r\n            _albumList.value = albums\r\n            Log.i(\"myDebugFetchAlbums\", \"after loadAudioData: ${_albumList.value}\")\r\n            setMediaItems()\r\n        }\r\n    }\r\n\r\n    private fun setMediaItems() = _songList.value.map { song ->\r\n        val mediaMetadata = MediaMetadata.Builder()\r\n            .setArtworkUri(song.imageUrl.toUri())\r\n            .setTitle(song.title)\r\n            .setDisplayTitle(song.title)\r\n            .setSubtitle(song.subtitle)\r\n            .setArtist(song.subtitle)\r\n            .setAlbumArtist(song.subtitle)\r\n            .setIsPlayable(true)\r\n            .build()\r\n        /*\r\n        Request metadata. New in (1.0.0-beta01)\r\n        This is optional. I'm adding a RequestMetadata to the MediaItem so I\r\n        can get the mediaUri from my `onAddMediaItems` simple use case (see\r\n        onAddMediaItems for more info).\r\n        If you are going to get the final URI from a database, you can move your\r\n        query to your `MediaLibrarySession.Callback#onAddMediaItems` and skip this.\r\n\r\n         */\r\n        /*\r\n        val rmd = MediaItem.RequestMetadata.Builder()\r\n            .setMediaUri(\"...\".toUri())\r\n            .build()\r\n\r\n         */\r\n\r\n        MediaItem.Builder()\r\n            .setMediaId(song.mediaId)\r\n            .setUri(song.songUrl)\r\n            .setMediaMetadata(mediaMetadata)\r\n            .build()\r\n    }.also { mediaItems ->\r\n        musicServiceHandler.setMediaItemList(mediaItems)\r\n    }\r\n\r\n    /*\r\n    private fun setMediaItems() {\r\n        songList.map { audio ->\r\n            MediaItem.Builder()\r\n                .setUri(audio.uri)\r\n                .setMediaMetadata(\r\n                    MediaMetadata.Builder()\r\n                        .setAlbumArtist(audio.artist)\r\n                        .setDisplayTitle(audio.title)\r\n                        .setSubtitle(audio.displayName)\r\n                        .build()\r\n                )\r\n                .build()\r\n        }.also {\r\n            musicServiceHandler.setMediaItemList(it)\r\n        }\r\n    }\r\n\r\n     */\r\n\r\n    private fun calculateProgressValue(currentProgress: Long) {\r\n        progress =\r\n            if (currentProgress > 0) ((currentProgress.toFloat() / duration.toFloat()) * 100f)\r\n            else 0f\r\n        progressString = formatDuration(currentProgress)\r\n    }\r\n\r\n    fun onTraditionalPlayerToggle(toggleOn: Boolean) {\r\n        _traditionalPlayerToggle.value = toggleOn\r\n    }\r\n\r\n    fun setShouldHandleBackPressed(condition: Boolean) {\r\n        shouldHandleBackPressed = condition\r\n    }\r\n\r\n    fun loadSongImage(context: Context, song: Song): StateFlow<Bitmap?> {\r\n        val bitMapItem = mediaIdBitmapItemMap[song.mediaId]\r\n        val requestOptions = RequestOptions()\r\n            .placeholder(R.drawable.ic_music)\r\n            .error(R.drawable.ic_music)\r\n\r\n        bitMapItem?.let { bitmapItem ->\r\n            Log.i(\"myDebug\", \"loadSongImage, mediaIdBitmapItemMap: $mediaIdBitmapItemMap\")\r\n            bitmapItem.bitmap?.let { bitmap ->\r\n                if(bitmap != loadHolderBitmap) {\r\n                    Log.i(\"myDebugGlide\", \"4\")\r\n                    Log.i(\"myDebug\", \"loadSongImage reduce time, song.mediaId: ${song.mediaId}\")\r\n                    Log.i(\"myDebug\", \"loadSongImage reduce time, loadHolderBitmap: $loadHolderBitmap\")\r\n                    return bitmapItem.bitmapStateFlow.asStateFlow()\r\n                }\r\n            }\r\n        }\r\n\r\n        if(bitMapItem == null) {\r\n            mediaIdBitmapItemMap[song.mediaId] = BitMapItem(null, MutableStateFlow(null))\r\n            /*\r\n            // first load local default image\r\n            GlideApp.with(context)\r\n                .asBitmap()\r\n                .load(R.drawable.load_holder)\r\n                .into(object : CustomTarget<Bitmap>() {\r\n                    override fun onResourceReady(\r\n                        resource: Bitmap,\r\n                        transition: Transition<in Bitmap>?) {\r\n                        Log.i(\"myDebugGlide\", \"1\")\r\n                        Log.i(\"myDebug\", \"In Glide, loadSongImage: load_holder, song: ${song.mediaId}\")\r\n\r\n                        // _songImage.value = resource\r\n                        mediaIdBitmapItemMap[song.mediaId]!!.bitmap = resource\r\n                        mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.value = resource\r\n                        if(loadHolderBitmap == null) loadHolderBitmap = resource\r\n                    }\r\n\r\n                    override fun onLoadCleared(placeholder: Drawable?) = Unit\r\n                })\r\n\r\n             */\r\n            try {\r\n                GlideApp.with(context)\r\n                    .asBitmap()\r\n                    .apply(requestOptions)\r\n                    .load(song.imageUrl)\r\n                    .into(object : CustomTarget<Bitmap>() {\r\n                        override fun onResourceReady(\r\n                            resource: Bitmap,\r\n                            transition: Transition<in Bitmap>?\r\n                        ) {\r\n                            Log.i(\"myDebugGlide\", \"2\")\r\n                            Log.i(\"myDebug\", \"In Glide, loadSongImage: song.imageUrl, song: ${song.mediaId}\")\r\n                            // _songImage.value = resource\r\n                            mediaIdBitmapItemMap[song.mediaId]!!.bitmap = resource\r\n                            mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.value = resource\r\n                        }\r\n\r\n                        override fun onLoadCleared(placeholder: Drawable?) {}\r\n                    })\r\n            } catch (glideException: GlideException) {\r\n                Log.i(\"myDebug\", \"error: ${glideException.rootCauses}\")\r\n            }\r\n        }else {\r\n            if(bitMapItem.bitmap == loadHolderBitmap) {\r\n                // load image from URL\r\n                try {\r\n                    GlideApp.with(context)\r\n                        .asBitmap()\r\n                        .apply(requestOptions)\r\n                        .load(song.imageUrl)\r\n                        .into(object : CustomTarget<Bitmap>() {\r\n                            override fun onResourceReady(\r\n                                resource: Bitmap,\r\n                                transition: Transition<in Bitmap>?\r\n                            ) {\r\n                                Log.i(\"myDebugGlide\", \"3\")\r\n                                Log.i(\"myDebug\", \"In Glide, loadSongImage: song.imageUrl, song: ${song.mediaId}\")\r\n                                // _songImage.value = resource\r\n                                mediaIdBitmapItemMap[song.mediaId]!!.bitmap = resource\r\n                                mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.value = resource\r\n                            }\r\n\r\n                            override fun onLoadCleared(placeholder: Drawable?) {}\r\n                        })\r\n                } catch (glideException: GlideException) {\r\n                    Log.i(\"myDebug\", \"glide error: ${glideException.rootCauses}\")\r\n                }\r\n            }\r\n\r\n        }\r\n\r\n        return mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.asStateFlow()\r\n    }\r\n\r\n    fun onUiEvents(\r\n        uiEvents: UIEvents,\r\n        isClickSong: Boolean = true,\r\n        traditionalPlayerToggle: Boolean = false,\r\n        getBackFromSongScreen: Boolean = false,\r\n        toggleFromTraditionalPlayer: Boolean = false,\r\n    ) = viewModelScope.launch {\r\n        when (uiEvents) {\r\n            UIEvents.Backward -> musicServiceHandler.onPlayerEvents(PlayerEvent.Backward)\r\n            UIEvents.Forward -> musicServiceHandler.onPlayerEvents(PlayerEvent.Forward)\r\n            UIEvents.SeekToNext -> {\r\n                musicServiceHandler.onPlayerEvents(PlayerEvent.SeekToNext)\r\n            }\r\n            UIEvents.SeekToPrevious -> {\r\n                musicServiceHandler.onPlayerEvents(PlayerEvent.SeekToPrevious)\r\n            }\r\n            is UIEvents.PlayPause -> {\r\n                musicServiceHandler.onPlayerEvents(\r\n                    PlayerEvent.PlayPause\r\n                )\r\n            }\r\n\r\n            is UIEvents.SeekTo -> {\r\n                musicServiceHandler.onPlayerEvents(\r\n                    PlayerEvent.SeekTo,\r\n                    seekPosition = ((duration * uiEvents.position) / 100f).toLong()\r\n                )\r\n            }\r\n\r\n            is UIEvents.SelectedSongChange -> {\r\n                musicServiceHandler.onPlayerEvents(\r\n                    playerEvent = PlayerEvent.SelectedSongChange,\r\n                    selectedSongIndex = uiEvents.index,\r\n                    isClickSong = isClickSong,\r\n                    traditionalPlayerToggle = traditionalPlayerToggle,\r\n                    getBackFromSongScreen = getBackFromSongScreen,\r\n                    toggleFromTraditionalPlayer = toggleFromTraditionalPlayer,\r\n                )\r\n            }\r\n\r\n            is UIEvents.UpdateProgress -> {\r\n                musicServiceHandler.onPlayerEvents(\r\n                    PlayerEvent.UpdateProgress(\r\n                        uiEvents.newProgress\r\n                    )\r\n                )\r\n                progress = uiEvents.newProgress\r\n            }\r\n        }\r\n    }\r\n\r\n\r\n    fun formatDuration(duration: Long): String {\r\n        val minute = TimeUnit.MINUTES.convert(duration, TimeUnit.MILLISECONDS)\r\n        val seconds = (minute) - minute * TimeUnit.SECONDS.convert(1, TimeUnit.MINUTES)\r\n        return String.format(\"%02d:%02d\", minute, seconds)\r\n    }\r\n\r\n    override fun onCleared() {\r\n        super.onCleared()\r\n        Log.i(\"myDebug\", \"ViewModel onCleared\")\r\n//        GlobalScope.launch(Main) {\r\n//            musicServiceHandler.onPlayerEvents(PlayerEvent.Stop)\r\n//        }\r\n    }\r\n\r\n\r\n}\r\n\r\ndata class BitMapItem(\r\n    var bitmap: Bitmap? = null,\r\n    var bitmapStateFlow: MutableStateFlow<Bitmap?>\r\n)\r\n\r\n\r\nsealed class UIEvents {\r\n    object PlayPause : UIEvents()\r\n    data class SelectedSongChange(val index: Int) : UIEvents()\r\n    data class SeekTo(val position: Float) : UIEvents()\r\n    object SeekToNext : UIEvents()\r\n    object SeekToPrevious : UIEvents()\r\n    object Backward : UIEvents()\r\n    object Forward : UIEvents()\r\n    data class UpdateProgress(val newProgress: Float) : UIEvents()\r\n}\r\n\r\nsealed class UIState {\r\n    object Initial : UIState()\r\n    object Ready : UIState()\r\n}
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeViewModel.kt b/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeViewModel.kt
+--- a/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeViewModel.kt	(revision d8bdb995ddb3840e1bbf114aa19c11c7c9c0435c)
++++ b/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/HomeViewModel.kt	(date 1699829337580)
+@@ -65,6 +65,9 @@
+     private val _albumList: MutableStateFlow<List<Album>> = MutableStateFlow(listOf<Album>())
+     val albumList: StateFlow<List<Album>> = _albumList.asStateFlow()
+ 
++    private val _albumImage: MutableStateFlow<Bitmap?> = MutableStateFlow(null)
++    val albumImage: StateFlow<Bitmap?> = _albumImage.asStateFlow()
++
+ 
+     var shouldHandleBackPressed = true
+         private set
+@@ -323,6 +326,34 @@
+         return mediaIdBitmapItemMap[song.mediaId]!!.bitmapStateFlow.asStateFlow()
+     }
+ 
++    fun loadAlbumImage(context: Context, album: Album): StateFlow<Bitmap?> {
++        //val bitMapItem = mediaIdBitmapItemMap[song.mediaId]
++        val requestOptions = RequestOptions()
++            .placeholder(R.drawable.ic_music)
++            .error(R.drawable.ic_music)
++
++        try {
++            GlideApp.with(context)
++                .asBitmap()
++                .apply(requestOptions)
++                .load(album.imageUrl)
++                .into(object : CustomTarget<Bitmap>() {
++                    override fun onResourceReady(
++                        resource: Bitmap,
++                        transition: Transition<in Bitmap>?
++                    ) {
++                        _albumImage.value = resource
++                    }
++
++                    override fun onLoadCleared(placeholder: Drawable?) {}
++                })
++        } catch (glideException: GlideException) {
++            Log.i("myDebug", "error: ${glideException.rootCauses}")
++        }
++
++        return _albumImage
++    }
++
+     fun onUiEvents(
+         uiEvents: UIEvents,
+         isClickSong: Boolean = true,
+Index: app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/components/AlbumItem.kt
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/components/AlbumItem.kt b/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/components/AlbumItem.kt
+new file mode 100644
+--- /dev/null	(date 1699829337624)
++++ b/app/src/main/java/com/tyj/spotifycloneandroidapp/presentation/screens/home/components/AlbumItem.kt	(date 1699829337624)
+@@ -0,0 +1,120 @@
++package com.tyj.spotifycloneandroidapp.presentation.screens.home.components
++
++import android.content.Context
++import android.graphics.Bitmap
++import android.graphics.drawable.Drawable
++import android.util.Log
++import androidx.compose.foundation.ExperimentalFoundationApi
++import androidx.compose.foundation.Image
++import androidx.compose.foundation.background
++import androidx.compose.foundation.basicMarquee
++import androidx.compose.foundation.clickable
++import androidx.compose.foundation.layout.Arrangement
++import androidx.compose.foundation.layout.Box
++import androidx.compose.foundation.layout.Column
++import androidx.compose.foundation.layout.Row
++import androidx.compose.foundation.layout.Spacer
++import androidx.compose.foundation.layout.fillMaxSize
++import androidx.compose.foundation.layout.fillMaxWidth
++import androidx.compose.foundation.layout.height
++import androidx.compose.foundation.layout.padding
++import androidx.compose.foundation.layout.size
++import androidx.compose.foundation.layout.width
++import androidx.compose.material3.Card
++import androidx.compose.material3.MaterialTheme
++import androidx.compose.material3.Text
++import androidx.compose.runtime.Composable
++import androidx.compose.runtime.getValue
++import androidx.compose.runtime.mutableStateOf
++import androidx.compose.runtime.remember
++import androidx.compose.runtime.setValue
++import androidx.compose.ui.Alignment
++import androidx.compose.ui.Modifier
++import androidx.compose.ui.graphics.asImageBitmap
++import androidx.compose.ui.layout.onSizeChanged
++import androidx.compose.ui.platform.LocalContext
++import androidx.compose.ui.text.style.TextOverflow
++import androidx.compose.ui.unit.dp
++import androidx.lifecycle.compose.collectAsStateWithLifecycle
++import com.bumptech.glide.load.engine.GlideException
++import com.bumptech.glide.request.RequestOptions
++import com.bumptech.glide.request.target.CustomTarget
++import com.bumptech.glide.request.transition.Transition
++import com.tyj.spotifycloneandroidapp.GlideApp
++import com.tyj.spotifycloneandroidapp.R
++import com.tyj.spotifycloneandroidapp.domain.model.Album
++import com.tyj.spotifycloneandroidapp.domain.model.Song
++import com.tyj.spotifycloneandroidapp.presentation.common.components.MusicBarAnimation
++import kotlinx.coroutines.flow.StateFlow
++
++@OptIn(ExperimentalFoundationApi::class)
++@Composable
++fun AlbumItem(
++    album: Album,
++    onItemClick: () -> Unit,
++    onLoadAlbumImage: (Context, Album) -> StateFlow<Bitmap?>,
++    currPlayingSong: Song,
++    isAudioPlaying: Boolean,
++) {
++
++    val albumImage by onLoadAlbumImage(LocalContext.current, album).collectAsStateWithLifecycle()
++
++    var cardHeight by remember {
++        mutableStateOf(0)
++    }
++
++    Card(
++        modifier = Modifier
++            .width(30.dp)
++            .height(30.dp)
++            .padding(5.dp)
++            .clickable {
++                onItemClick()
++            }
++            .onSizeChanged {
++                Log.i("myDebugMusicBarAnimation", "Card size changed, ${it.height}")
++                cardHeight = it.height
++            },
++    ) {
++
++        Box(
++            contentAlignment = Alignment.Center,
++            modifier = Modifier.fillMaxSize()
++        ) {
++            albumImage?.let {
++                Image(
++                    bitmap = it.asImageBitmap(),
++                    contentDescription = "album image",
++                    modifier = Modifier.fillMaxSize()
++                )
++            }
++
++            Text(
++                text = "${album.title} - ${album.artist}",
++                style = MaterialTheme.typography.bodyMedium,
++                maxLines = 2,
++                modifier = Modifier
++                    .fillMaxWidth()
++                    .basicMarquee()
++            )
++
++
++
++
++        }
++
++        /*
++        // add MusicBarAnimation
++        if(song == currPlayingSong) {
++            Log.i("myDebugMusicBarAnimation", "song: $song")
++            Log.i("myDebugMusicBarAnimation", "currPlayingSong: $currPlayingSong")
++            MusicBarAnimation(
++                isAudioPlaying = isAudioPlaying,
++                height = cardHeight,
++            )
++        }
++
++         */
++
++    }
++}
+\ No newline at end of file

@@ -25,7 +25,7 @@ object ViewModelModule {
 
     @Provides
     @ViewModelScoped
-    fun provideMusicRepository(@BindFakeMusicDatabase musicDatabase: MusicDatabase): MusicRepository {
+    fun provideMusicRepository(@BindSpotifyMusicDatabase musicDatabase: MusicDatabase): MusicRepository {
         return FirebaseMusicRepository(musicDatabase)
     }
 
